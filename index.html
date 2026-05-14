@@ -1,0 +1,3750 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920, initial-scale=1">
+  <title>microbiologia agricola — hgt × alimenti fermentati</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Preload critical asset for fast first paint -->
+  <link rel="preload" as="video" href="assets/hf-01-campo-grano.mp4" type="video/mp4">
+  <link rel="preload" as="image" href="assets/r02-yogurt.png">
+  <link rel="preload" as="image" href="assets/g15-cover-salumi.png">
+
+  <style>
+    :root {
+      /* Palette Farm Minerals (audit 2026-05-14) */
+      --white:           #FFFFFF;
+      --beige:           #F5EDE6;
+      --olive-soft:      rgba(122, 131, 95, 0.10);
+      --green-light:     #7C914C;
+      --green-mid:       #596A33;
+      --green-deep:      #4E5538;
+      --heading-color:   #636F3D;
+      --main-green:      #404F1D;
+      --card-title:      #4C5B20;
+      --ink-dark:        #1F2509;
+      --cream-warm:      #FFFBF7;
+      --cream-light:     #F2F2ED;
+      --divider-beige:   rgba(217, 209, 201, 0.20);
+      --ink:             #000000;
+
+      --font-sans: 'Aeonik', 'Inter', Arial, sans-serif;
+
+      --slide-w: 1920px;
+      --slide-h: 1080px;
+
+      --ease: cubic-bezier(.23, 1, .32, 1);
+      --ease-fast: 0.3s var(--ease);
+      --ease-slow: 0.7s var(--ease);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--ink);
+      font-family: var(--font-sans);
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: var(--slide-w);
+      height: var(--slide-h);
+      background: var(--beige);
+      color: var(--heading-color);
+      overflow: hidden;
+      flex-shrink: 0;
+      transform-origin: center center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.7s var(--ease);
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       Componenti riusabili (Farm Minerals)
+       ────────────────────────────────────────────────────────────── */
+
+    /* Hero video/image fullbleed (MOV-9) */
+    .hero-media {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+    }
+
+    .hero-shade {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .hero-shade.diag-tl {
+      background:
+        linear-gradient(135deg, rgba(31, 37, 9, 0.55) 0%, rgba(31, 37, 9, 0.20) 45%, rgba(31, 37, 9, 0) 70%),
+        linear-gradient(to top, rgba(31, 37, 9, 0.40) 0%, rgba(31, 37, 9, 0) 35%);
+    }
+
+    .hero-shade.diag-bl {
+      background:
+        linear-gradient(45deg, rgba(31, 37, 9, 0.60) 0%, rgba(31, 37, 9, 0.20) 50%, rgba(31, 37, 9, 0) 75%),
+        linear-gradient(to top, rgba(31, 37, 9, 0.30) 0%, rgba(31, 37, 9, 0) 30%);
+    }
+
+    .hero-overlay {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      padding: 96px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      row-gap: 48px;
+      color: var(--beige);
+    }
+
+    /* Eyebrow Farm Minerals (dot signature 8px + ALL CAPS 18px) */
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-light);
+      display: inline-block;
+    }
+
+    /* Footer-row (divider 1px sopra + authors con dot) */
+    .footer-row {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding-top: 28px;
+    }
+
+    .footer-row::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 1px;
+      background: rgba(244, 237, 230, 0.25);
+    }
+
+    .footer-row .authors {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-row .authors .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green-light);
+      display: inline-block;
+    }
+
+    /* Stagger entrance (MOV-4) */
+    .stagger {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+    }
+
+    .slide.entered .stagger { opacity: 1; transform: translateY(0); }
+    .slide.entered .stagger:nth-of-type(1) { transition-delay: 0.20s; }
+    .slide.entered .stagger:nth-of-type(2) { transition-delay: 0.35s; }
+    .slide.entered .stagger:nth-of-type(3) { transition-delay: 0.50s; }
+    .slide.entered .stagger:nth-of-type(4) { transition-delay: 0.65s; }
+    .slide.entered .stagger:nth-of-type(5) { transition-delay: 0.80s; }
+    .slide.entered .stagger:nth-of-type(6) { transition-delay: 0.95s; }
+    .slide.entered .stagger:nth-of-type(7) { transition-delay: 1.10s; }
+    .slide.entered .stagger:nth-of-type(8) { transition-delay: 1.25s; }
+    /* footer-row is typically last; gets natural progression delay */
+
+    /* Glyph-by-glyph reveal (MOV-2) — split via JS */
+    .glyph-claim {
+      display: inline-block;
+      font-weight: 500;
+      font-size: 110px;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      margin: 0;
+    }
+
+    .glyph-claim .word {
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .glyph-claim span.glyph.em { color: var(--green-light); }
+
+    .glyph-claim span.glyph {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s var(--ease), transform 0.7s var(--ease);
+      transition-delay: calc(var(--i) * 30ms + 0.6s);
+    }
+
+    .slide.entered .glyph-claim span.glyph {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       r01 — Cover (hero video + titolo overlay)
+       ────────────────────────────────────────────────────────────── */
+    #r01 .title-block { align-self: center; max-width: 1600px; }
+    #r01 h1 {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 168px;
+      line-height: 0.93;
+      letter-spacing: -0.02em;
+      color: var(--beige);
+      margin: 0;
+      text-transform: lowercase;
+    }
+    #r01 h1 .accent { color: var(--green-light); }
+    #r01 h1 .kicker {
+      display: block;
+      margin-top: 24px;
+      font-size: 80px;
+      font-weight: 400;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      color: var(--cream-warm);
+      opacity: 0.92;
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       r02 — Hook (foto yogurt fullbleed + glyph claim)
+       Personality: hero-foto-fullbleed
+       Storia: il problema dell'antibiotico-resistenza è nel cibo quotidiano
+       ────────────────────────────────────────────────────────────── */
+    #r02 .claim-block {
+      align-self: end;
+      max-width: 1200px;
+      padding-bottom: 48px;
+    }
+
+    #r02 .glyph-claim {
+      font-size: 110px;
+      color: var(--beige);
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       r03 — HGT meccanismi (flowchart-orizzontale + SVG draw-in MOV-5)
+       Storia: 3 vie del trasferimento orizzontale, schemi line-art
+       ────────────────────────────────────────────────────────────── */
+    #r03 {
+      background: var(--beige);
+      color: var(--heading-color);
+    }
+
+    #r03 .overlay {
+      position: relative;
+      height: 100%;
+      padding: 96px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      row-gap: 64px;
+    }
+
+    #r03 .eyebrow { color: var(--main-green); }
+    #r03 .eyebrow .dot { background: var(--green-light); }
+
+    #r03 .title-row h2 {
+      margin: 0;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 88px;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--heading-color);
+      max-width: 1400px;
+    }
+
+    #r03 .mech-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: 80px;
+      align-items: start;
+      padding-top: 24px;
+    }
+
+    #r03 .mech {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 24px;
+      background: rgba(122, 131, 95, 0.10);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    #r03 .mech-video {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: transparent;
+      display: block;
+      border-radius: 4px;
+    }
+
+    #r03 .mech-num {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 20px;
+      letter-spacing: 0.18em;
+      color: var(--green-light);
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    #r03 .mech-name {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 44px;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--main-green);
+      margin: 8px 0 0;
+      text-transform: lowercase;
+    }
+
+    #r03 .mech-desc {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 20px;
+      line-height: 1.4;
+      color: var(--green-deep);
+      margin: 12px 0 0;
+      max-width: 360px;
+    }
+
+    #r03 .footer-row { color: var(--main-green); }
+    #r03 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+    #r03 .footer-row .authors .dot { background: var(--green-light); }
+
+    /* SVG draw-in (MOV-5): ogni elemento stroked si disegna progressivo */
+    .draw-in [data-len] {
+      stroke-dasharray: var(--len);
+      stroke-dashoffset: var(--len);
+    }
+
+    .slide.entered .draw-in [data-len] {
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1.4s var(--ease);
+      transition-delay: var(--draw-delay, 0s);
+    }
+
+    /* Stagger draw-in dei 3 meccanismi */
+    #r03 .mech:nth-child(1) .draw-in [data-len] { --draw-delay: 0.5s; }
+    #r03 .mech:nth-child(2) .draw-in [data-len] { --draw-delay: 0.8s; }
+    #r03 .mech:nth-child(3) .draw-in [data-len] { --draw-delay: 1.1s; }
+
+
+    /* ──────────────────────────────────────────────────────────────
+       r04 — Plasmidi (schema-scientifico-fullbleed)
+       Video Manim plasmide circolare + label
+       ────────────────────────────────────────────────────────────── */
+    #r04 {
+      background: var(--beige);
+      color: var(--main-green);
+    }
+    #r04 .overlay {
+      position: relative;
+      height: 100%;
+      padding: 96px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr auto;
+      column-gap: 80px;
+      row-gap: 48px;
+    }
+    #r04 .eyebrow { grid-column: 1 / 3; }
+    #r04 .schema-video {
+      grid-column: 1;
+      grid-row: 2;
+      align-self: center;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: rgba(122, 131, 95, 0.10);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    #r04 .desc-block { grid-column: 2; grid-row: 2; align-self: center; }
+    #r04 h2 {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 88px;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--heading-color);
+      margin: 0 0 32px;
+    }
+    #r04 .desc-body {
+      font-size: 26px;
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--green-deep);
+      max-width: 520px;
+      margin: 0;
+    }
+    #r04 .footer-row { grid-column: 1 / 3; }
+    #r04 .footer-row { color: var(--main-green); }
+    #r04 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* ──────────────────────────────────────────────────────────────
+       r05 — LAB negli alimenti (hero-foto-fullbleed)
+       ────────────────────────────────────────────────────────────── */
+    #r05 .claim-block {
+      align-self: end;
+      max-width: 1300px;
+      padding-bottom: 60px;
+    }
+    #r05 .glyph-claim {
+      font-size: 100px;
+      color: var(--beige);
+    }
+    #r05 .subhead {
+      margin-top: 24px;
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--cream-warm);
+      opacity: 0.85;
+      max-width: 800px;
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       r06 — Zinno paper (magazine-paper-spread)
+       Layout 50/50: testo obiettivo a sinistra, paper image a destra
+       ────────────────────────────────────────────────────────────── */
+    #r06 {
+      background: var(--beige);
+      color: var(--main-green);
+    }
+    #r06 .overlay {
+      position: relative;
+      height: 100%;
+      padding: 96px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr auto;
+      column-gap: 80px;
+      row-gap: 48px;
+    }
+    #r06 .eyebrow { grid-column: 1 / 3; }
+    #r06 .text-col { grid-column: 1; grid-row: 2; align-self: center; }
+    #r06 .paper-col {
+      grid-column: 2;
+      grid-row: 2;
+      align-self: center;
+      max-height: 720px;
+      overflow: hidden;
+      border-radius: 5px;
+      box-shadow: 0 22px 50px rgba(64, 79, 29, 0.15);
+    }
+    #r06 .paper-col img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #r06 h2 {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 76px;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--heading-color);
+      margin: 0 0 28px;
+      max-width: 720px;
+    }
+    #r06 .citation {
+      font-size: 16px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin-bottom: 24px;
+    }
+    #r06 .body-text {
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.45;
+      color: var(--green-deep);
+      max-width: 600px;
+      margin: 0;
+    }
+    #r06 .footer-row { grid-column: 1 / 3; color: var(--main-green); }
+    #r06 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* ──────────────────────────────────────────────────────────────
+       r07 — Zinno metodi (pipeline 4 card CSS, no video)
+       ────────────────────────────────────────────────────────────── */
+    #r07 {
+      background: var(--beige);
+      color: var(--main-green);
+    }
+    #r07 .overlay {
+      position: relative;
+      height: 100%;
+      padding: 96px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      row-gap: 56px;
+    }
+    #r07 h2 {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 84px;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--heading-color);
+      margin: 0;
+      max-width: 1500px;
+    }
+    #r07 .pipeline-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      column-gap: 32px;
+      align-items: stretch;
+      align-self: center;
+      position: relative;
+    }
+    #r07 .step {
+      background: var(--olive-soft);
+      border-radius: 8px;
+      padding: 36px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+    }
+    #r07 .step .icon {
+      width: 56px;
+      height: 56px;
+      color: var(--green-light);
+    }
+    #r07 .step .icon svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    #r07 .step .num {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 16px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin: 0;
+    }
+    #r07 .step .title {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 28px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--main-green);
+      margin: 0;
+    }
+    #r07 .step .body {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.45;
+      color: var(--green-deep);
+      margin: 0;
+    }
+    #r07 .step::after {
+      content: "";
+      position: absolute;
+      right: -22px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 12px;
+      height: 12px;
+      border-top: 2px solid var(--green-light);
+      border-right: 2px solid var(--green-light);
+      transform: translateY(-50%) rotate(45deg);
+    }
+    #r07 .step:last-child::after { display: none; }
+    #r07 .footer-row { color: var(--main-green); }
+    #r07 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* ──────────────────────────────────────────────────────────────
+       r08 — 56% dairy (hero-verbale-gigante: stat number)
+       MOV-6: number gigante + 4 colonne stats
+       ────────────────────────────────────────────────────────────── */
+    #r08 {
+      background: var(--beige);
+      color: var(--main-green);
+    }
+    #r08 .overlay {
+      position: relative;
+      height: 100%;
+      padding: 96px;
+      display: grid;
+      grid-template-rows: auto 1fr auto auto;
+      row-gap: 48px;
+    }
+    #r08 .stat-hero {
+      align-self: center;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 64px;
+      align-items: end;
+    }
+    #r08 .stat-number {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 420px;
+      line-height: 0.85;
+      letter-spacing: -0.04em;
+      color: var(--main-green);
+      margin: 0;
+    }
+    #r08 .stat-number .pct {
+      font-size: 240px;
+      color: var(--green-light);
+      vertical-align: top;
+      letter-spacing: -0.04em;
+    }
+    #r08 .stat-caption {
+      align-self: end;
+      padding-bottom: 80px;
+    }
+    #r08 .stat-caption h2 {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 44px;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--heading-color);
+      margin: 0 0 24px;
+    }
+    #r08 .stat-caption p {
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--green-deep);
+      max-width: 460px;
+      margin: 0;
+    }
+    #r08 .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      column-gap: 40px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(64, 79, 29, 0.20);
+    }
+    #r08 .stat-grid .cell .num {
+      font-size: 88px;
+      font-weight: 400;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      color: var(--main-green);
+      margin: 0 0 8px;
+    }
+    #r08 .stat-grid .cell .lbl {
+      font-size: 14px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green-light);
+    }
+    #r08 .footer-row { color: var(--main-green); }
+    #r08 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* ──────────────────────────────────────────────────────────────
+       r09 — Tn916 (split: testo a sinistra, video Manim a destra)
+       ────────────────────────────────────────────────────────────── */
+    #r09 {
+      background: var(--beige);
+      color: var(--main-green);
+    }
+    #r09 .overlay {
+      position: relative;
+      height: 100%;
+      padding: 96px;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      grid-template-rows: auto 1fr auto;
+      column-gap: 80px;
+      row-gap: 48px;
+    }
+    #r09 .eyebrow { grid-column: 1 / 3; }
+    #r09 .text-col { grid-column: 1; grid-row: 2; align-self: center; }
+    #r09 .schema-video {
+      grid-column: 2;
+      grid-row: 2;
+      align-self: center;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: rgba(122, 131, 95, 0.10);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    #r09 .r09-citation {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin: 0 0 20px;
+    }
+    #r09 .caption strong { font-weight: 500; color: var(--main-green); }
+    #r09 .caption em { font-style: italic; color: var(--green-light); font-weight: 500; }
+    #r09 h2 {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 64px;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--heading-color);
+      margin: 0 0 28px;
+    }
+    #r09 .caption {
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--green-deep);
+      max-width: 560px;
+      margin: 0;
+      padding-left: 18px;
+      border-left: 2px solid var(--green-light);
+    }
+    #r09 .footer-row { grid-column: 1 / 3; color: var(--main-green); }
+    #r09 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* ──────────────────────────────────────────────────────────────
+       r10 — Coniugazione macro (video-dominante-cinematic)
+       Higgsfield Kling 3.0 microscopia macro
+       ────────────────────────────────────────────────────────────── */
+    #r10 .claim-block {
+      align-self: end;
+      max-width: 1100px;
+      padding-bottom: 60px;
+    }
+    #r10 .glyph-claim {
+      font-size: 92px;
+      color: var(--beige);
+    }
+    #r10 .caption {
+      margin-top: 28px;
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--cream-warm);
+      opacity: 0.85;
+      max-width: 700px;
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       r11 — Evidenze (manifesto-tipografico: 3 punti dichiarativi)
+       ────────────────────────────────────────────────────────────── */
+    #r11 {
+      background: var(--beige);
+      color: var(--main-green);
+    }
+    #r11 .overlay {
+      position: relative;
+      height: 100%;
+      padding: 96px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      row-gap: 56px;
+    }
+    #r11 h2 {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 80px;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--heading-color);
+      margin: 0;
+      max-width: 1500px;
+    }
+    #r11 .points {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: 80px;
+      align-items: start;
+      padding-top: 24px;
+    }
+    #r11 .point .point-num {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 18px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin: 0 0 16px;
+    }
+    #r11 .point .point-title {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 40px;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--main-green);
+      margin: 0 0 20px;
+      max-width: 360px;
+    }
+    #r11 .point .point-body {
+      font-size: 20px;
+      font-weight: 400;
+      line-height: 1.45;
+      color: var(--green-deep);
+      max-width: 380px;
+      margin: 0;
+    }
+    #r11 .footer-row { color: var(--main-green); }
+    #r11 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+    #r11 .point-body strong { font-weight: 500; color: var(--main-green); }
+    #r11 .point-body em { font-style: italic; color: var(--green-light); font-weight: 500; }
+    #r11 .point-body code { font-family: 'Menlo', 'Monaco', monospace; font-size: 16px; background: var(--olive-soft); padding: 2px 6px; border-radius: 3px; color: var(--main-green); }
+    #r12 .limits-grid em { font-style: italic; color: var(--green-light); font-weight: 500; }
+    #r12 .limits-grid strong { font-weight: 500; color: var(--beige); }
+
+    /* ──────────────────────────────────────────────────────────────
+       r12 — Limiti (manifesto + glyph "manca la prova in vivo")
+       ────────────────────────────────────────────────────────────── */
+    #r12 {
+      background: var(--main-green);
+      color: var(--beige);
+    }
+    #r12 .overlay {
+      position: relative;
+      height: 100%;
+      padding: 96px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      row-gap: 56px;
+    }
+    #r12 .eyebrow { color: var(--beige); }
+    #r12 .eyebrow .dot { background: var(--green-light); }
+    #r12 .claim-block {
+      align-self: center;
+    }
+    #r12 .glyph-claim {
+      font-size: 130px;
+      color: var(--beige);
+    }
+    #r12 .glyph-claim .em {
+      color: var(--green-light);
+    }
+    #r12 .limits-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      column-gap: 40px;
+      align-items: start;
+      padding-top: 32px;
+      border-top: 1px solid rgba(244, 237, 230, 0.20);
+    }
+    #r12 .limits-grid .limit .num {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 18px;
+      letter-spacing: 0.18em;
+      color: var(--green-light);
+      text-transform: uppercase;
+      margin: 0 0 12px;
+    }
+    #r12 .limits-grid .limit p {
+      font-size: 18px;
+      line-height: 1.4;
+      color: var(--beige);
+      opacity: 0.85;
+      margin: 0;
+    }
+    #r12 .footer-row { color: var(--beige); }
+    #r12 .footer-row::before { background: rgba(244, 237, 230, 0.20); }
+
+    /* ──────────────────────────────────────────────────────────────
+       r13 — Ponte ai compagni (paper-cards-side-by-side)
+       2 paper cards: Diaz salumi + Xiang microbiota
+       ────────────────────────────────────────────────────────────── */
+    #r13 {
+      background: var(--beige);
+      color: var(--main-green);
+    }
+    #r13 .overlay {
+      position: relative;
+      height: 100%;
+      padding: 96px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      row-gap: 56px;
+    }
+    #r13 h2 {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 76px;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--heading-color);
+      margin: 0;
+      max-width: 1300px;
+    }
+    #r13 .papers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 80px;
+      align-items: start;
+      padding-top: 24px;
+    }
+    #r13 .paper-card {
+      background: var(--olive-soft);
+      border-radius: 5px;
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1fr;
+      row-gap: 24px;
+    }
+    #r13 .paper-cover {
+      width: 100%;
+      height: 360px;
+      overflow: hidden;
+      border-radius: 5px;
+    }
+    #r13 .paper-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #r13 .paper-citation {
+      font-size: 14px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin: 0;
+    }
+    #r13 .paper-title {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 38px;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--main-green);
+      margin: 0;
+    }
+    #r13 .paper-speaker {
+      font-size: 14px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green-deep);
+      margin: 0;
+    }
+    #r13 .footer-row { color: var(--main-green); }
+    #r13 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* ──────────────────────────────────────────────────────────────
+       r14 — Handoff (solid-color reveal 3-fasce MOV-1)
+       ────────────────────────────────────────────────────────────── */
+    #r14 {
+      background: var(--main-green);
+      color: var(--beige);
+    }
+    #r14 .reveal-stage {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    #r14 .reveal-line {
+      background: var(--main-green);
+      transform: translateY(0%);
+      transition: transform 1.0s var(--ease);
+    }
+    .slide.entered #r14 .reveal-line.first  { transform: translateY(-100%); }
+    .slide.entered #r14 .reveal-line.second { transform: translateY(100%); }
+    .slide.entered #r14 .reveal-line.third  { transform: translateY(-100%); }
+    /* Direct selector since reveal-line is inside #r14 */
+    #r14.slide.active .reveal-line.first { transition-delay: 0.20s; }
+    #r14.slide.active .reveal-line.second { transition-delay: 0.40s; }
+    #r14.slide.active .reveal-line.third { transition-delay: 0.60s; }
+    #r14.entered .reveal-line.first  { transform: translateY(-100%); }
+    #r14.entered .reveal-line.second { transform: translateY(100%); }
+    #r14.entered .reveal-line.third  { transform: translateY(-100%); }
+
+    #r14 .reveal-bg {
+      position: absolute;
+      inset: 0;
+      background: var(--main-green);
+      z-index: -1;
+    }
+    #r14 .hero-overlay {
+      position: relative;
+      z-index: 2;
+      color: var(--beige);
+    }
+    #r14 .eyebrow { color: var(--beige); }
+    #r14 .eyebrow .dot { background: var(--green-light); }
+    #r14 .handoff-block { align-self: center; max-width: 1500px; }
+    #r14 .recap {
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.4;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--beige);
+      opacity: 0.7;
+      margin: 0 0 40px;
+    }
+    #r14 .recap .emph { color: var(--green-light); font-weight: 500; opacity: 1; text-transform: none; }
+    #r14 h1 {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 140px;
+      line-height: 0.93;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--beige);
+      margin: 0;
+    }
+    #r14 h1 .accent { color: var(--green-light); }
+    #r14 .next-speaker {
+      margin-top: 40px;
+      font-size: 24px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cream-warm);
+      opacity: 0.85;
+    }
+    #r14 .footer-row { color: var(--beige); }
+    #r14 .footer-row::before { background: rgba(244, 237, 230, 0.25); }
+
+
+    /* ──────────────────────────────────────────────────────────────
+       GIORGIO BLOCK (g15-g24) — Diaz 2025, salumi spagnoli ARG
+       Pattern: stesso brand Farm Minerals, sticker "G" come marker speaker
+       ────────────────────────────────────────────────────────────── */
+
+    /* g15 — Cover Giorgio (hero-foto-fullbleed) */
+    #g15 .claim-block {
+      align-self: end;
+      max-width: 1400px;
+      padding-bottom: 60px;
+    }
+    #g15 h1 {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 140px;
+      line-height: 0.93;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--beige);
+      margin: 0;
+    }
+    #g15 h1 .accent { color: var(--green-light); }
+    #g15 .speaker-tag {
+      margin-bottom: 24px;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cream-warm);
+      opacity: 0.85;
+    }
+
+    /* g16 — Diaz paper (magazine-paper-spread) */
+    #g16 {
+      background: var(--beige);
+      color: var(--main-green);
+    }
+    #g16 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr auto;
+      column-gap: 80px; row-gap: 48px;
+    }
+    #g16 .eyebrow { grid-column: 1 / 3; }
+    #g16 .text-col { grid-column: 1; grid-row: 2; align-self: center; }
+    #g16 .paper-col {
+      grid-column: 2; grid-row: 2; align-self: center;
+      max-height: 720px; overflow: hidden;
+      border-radius: 5px;
+      box-shadow: 0 22px 50px rgba(64, 79, 29, 0.15);
+    }
+    #g16 .paper-col img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #g16 h2 {
+      font-family: var(--font-sans);
+      font-weight: 500; font-size: 64px;
+      line-height: 0.95; letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--heading-color);
+      margin: 0 0 28px;
+      max-width: 720px;
+    }
+    #g16 .citation {
+      font-size: 16px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light);
+      margin-bottom: 24px;
+    }
+    #g16 .body-text {
+      font-size: 22px; line-height: 1.45;
+      color: var(--green-deep);
+      max-width: 600px; margin: 0;
+    }
+    #g16 .footer-row { grid-column: 1 / 3; color: var(--main-green); }
+    #g16 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* g17 — il problema MDR (hero-verbale-gigante + count-up) */
+    #g17 {
+      background: var(--beige);
+      color: var(--main-green);
+    }
+    #g17 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      row-gap: 48px;
+    }
+    #g17 .stat-hero {
+      align-self: center;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 64px;
+      align-items: end;
+    }
+    #g17 .stat-number {
+      font-family: var(--font-sans);
+      font-weight: 400; font-size: 380px;
+      line-height: 0.85; letter-spacing: -0.04em;
+      color: var(--main-green);
+      margin: 0;
+    }
+    #g17 .stat-number .pct {
+      font-size: 200px;
+      color: var(--green-light);
+      vertical-align: top;
+      letter-spacing: -0.04em;
+    }
+    #g17 .stat-caption { align-self: end; padding-bottom: 60px; }
+    #g17 .stat-caption h2 {
+      font-family: var(--font-sans);
+      font-weight: 500; font-size: 42px;
+      line-height: 1.0; letter-spacing: -0.02em;
+      text-transform: lowercase;
+      color: var(--heading-color);
+      margin: 0 0 24px;
+    }
+    #g17 .stat-caption p {
+      font-size: 22px; line-height: 1.4;
+      color: var(--green-deep);
+      max-width: 480px; margin: 0;
+    }
+    #g17 .footer-row { color: var(--main-green); }
+    #g17 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* g18 — obiettivo (manifesto tipografico, claim glyph) */
+    #g18 {
+      background: var(--main-green);
+      color: var(--beige);
+    }
+    #g18 .overlay { position: relative; height: 100%; padding: 96px; display: grid; grid-template-rows: auto 1fr auto; row-gap: 48px; }
+    #g18 .eyebrow { color: var(--beige); }
+    #g18 .eyebrow .dot { background: var(--green-light); }
+    #g18 .claim-block { align-self: center; max-width: 1500px; }
+    #g18 .glyph-claim { font-size: 120px; color: var(--beige); }
+    #g18 .glyph-claim .em { color: var(--green-light); }
+    #g18 .footer-row { color: var(--beige); }
+    #g18 .footer-row::before { background: rgba(244, 237, 230, 0.20); }
+
+    /* g19 — metodi (flowchart 4 cards, riusa pattern r07) */
+    #g19 { background: var(--beige); color: var(--main-green); }
+    #g19 .overlay { position: relative; height: 100%; padding: 96px; display: grid; grid-template-rows: auto auto 1fr auto; row-gap: 56px; }
+    #g19 h2 {
+      font-family: var(--font-sans); font-weight: 500; font-size: 80px;
+      line-height: 0.95; letter-spacing: -0.02em;
+      text-transform: lowercase; color: var(--heading-color);
+      margin: 0; max-width: 1500px;
+    }
+    #g19 .pipeline-row {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      column-gap: 32px; align-items: stretch; align-self: center;
+    }
+    #g19 .step {
+      background: var(--olive-soft);
+      border-radius: 8px; padding: 36px 28px;
+      display: flex; flex-direction: column; gap: 18px;
+      position: relative;
+    }
+    #g19 .step .icon { width: 56px; height: 56px; color: var(--green-light); }
+    #g19 .step .icon svg { width: 100%; height: 100%; display: block; }
+    #g19 .step .num {
+      font-size: 16px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light); margin: 0;
+    }
+    #g19 .step .title {
+      font-weight: 500; font-size: 26px; line-height: 1.05;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--main-green); margin: 0;
+    }
+    #g19 .step .body {
+      font-size: 16px; line-height: 1.45; color: var(--green-deep); margin: 0;
+    }
+    #g19 .step::after {
+      content: ""; position: absolute; right: -22px; top: 50%;
+      width: 12px; height: 12px;
+      border-top: 2px solid var(--green-light);
+      border-right: 2px solid var(--green-light);
+      transform: translateY(-50%) rotate(45deg);
+    }
+    #g19 .step:last-child::after { display: none; }
+    #g19 .footer-row { color: var(--main-green); }
+    #g19 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* g20 — risultato enterococchi (stat-grid + barra orizzontale) */
+    #g20 { background: var(--beige); color: var(--main-green); }
+    #g20 .overlay { position: relative; height: 100%; padding: 96px; display: grid; grid-template-rows: auto auto 1fr auto; row-gap: 48px; }
+    #g20 h2 {
+      font-family: var(--font-sans); font-weight: 500; font-size: 72px;
+      line-height: 0.95; letter-spacing: -0.02em;
+      text-transform: lowercase; color: var(--heading-color);
+      margin: 0; max-width: 1500px;
+    }
+    #g20 h2 .em { color: var(--green-light); }
+    #g20 .resist-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: 40px;
+      align-self: center;
+    }
+    #g20 .resist-card {
+      background: var(--olive-soft);
+      border-radius: 8px;
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    #g20 .resist-card .name {
+      font-family: var(--font-sans);
+      font-size: 14px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green-light);
+      margin: 0;
+    }
+    #g20 .resist-card .pct {
+      font-family: var(--font-sans);
+      font-weight: 400;
+      font-size: 110px;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      color: var(--main-green);
+      margin: 0;
+    }
+    #g20 .resist-card .pct .small {
+      font-size: 50px;
+      color: var(--green-light);
+      vertical-align: top;
+    }
+    #g20 .resist-card .desc {
+      font-size: 16px;
+      line-height: 1.4;
+      color: var(--green-deep);
+      margin: 0;
+    }
+    #g20 .resist-card .bar {
+      height: 8px;
+      background: var(--olive-soft);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    #g20 .resist-card:nth-of-type(1) .bar::after { transition-delay: 0.8s; }
+    #g20 .resist-card:nth-of-type(2) .bar::after { transition-delay: 1.0s; }
+    #g20 .resist-card:nth-of-type(3) .bar::after { transition-delay: 1.2s; }
+    #g20 .resist-card .bar::after {
+      content: ""; position: absolute; inset: 0;
+      width: 0;
+      background: linear-gradient(90deg, var(--main-green), var(--green-light));
+      transition: width 1.6s var(--ease);
+      transition-delay: 0.8s;
+      border-radius: 4px;
+    }
+    #r03.slide.entered ~ * .bar::after, /* dummy guard */
+    .slide.entered #g20 .resist-card .bar::after,
+    #g20.entered .resist-card .bar::after {
+      width: var(--bar-fill);
+    }
+    #g20 .footer-row { color: var(--main-green); }
+    #g20 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* g21 — effetto stagionatura (split 2 colonne lungo vs breve) */
+    #g21 { background: var(--beige); color: var(--main-green); }
+    #g21 .overlay { position: relative; height: 100%; padding: 96px; display: grid; grid-template-rows: auto auto 1fr auto; row-gap: 48px; }
+    #g21 h2 {
+      font-weight: 500; font-size: 72px; line-height: 0.95;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--heading-color); margin: 0;
+    }
+    #g21 .compare {
+      display: grid; grid-template-columns: 1fr 1fr;
+      column-gap: 80px;
+      align-self: center;
+    }
+    #g21 .compare-card {
+      background: var(--olive-soft);
+      border-radius: 8px;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    #g21 .compare-card .label {
+      font-size: 14px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light);
+      margin: 0;
+    }
+    #g21 .compare-card .duration {
+      font-weight: 500; font-size: 48px; line-height: 1.0;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--main-green); margin: 0;
+    }
+    #g21 .compare-card .resistant {
+      font-size: 22px; line-height: 1.45;
+      color: var(--green-deep); margin: 0;
+    }
+    
+    #g21 .compare-card .compare-img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 5px;
+    }
+    #g21 .compare-card .compare-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    #g21 .compare-card .resistant strong {
+      color: var(--main-green); font-weight: 500;
+    }
+    #g21 .footer-row { color: var(--main-green); }
+    #g21 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* g22 — implicazioni consumatore (manifesto + image) */
+    #g22 .claim-block { align-self: end; max-width: 1300px; padding-bottom: 50px; }
+    #g22 .glyph-claim { font-size: 96px; color: var(--beige); }
+    #g22 .subhead {
+      margin-top: 28px; font-size: 22px; line-height: 1.4;
+      color: var(--cream-warm); opacity: 0.85; max-width: 720px;
+    }
+
+    /* g23 — limiti (manifesto-tipografico riusa pattern r12) */
+    #g23 { background: var(--main-green); color: var(--beige); }
+    #g23 .overlay { position: relative; height: 100%; padding: 96px; display: grid; grid-template-rows: auto auto 1fr auto; row-gap: 56px; }
+    #g23 .eyebrow { color: var(--beige); }
+    #g23 .eyebrow .dot { background: var(--green-light); }
+    #g23 h2 {
+      font-weight: 500; font-size: 68px; line-height: 0.95;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--beige); margin: 0;
+    }
+    #g23 .limits-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      column-gap: 40px; align-items: start;
+      padding-top: 24px;
+      border-top: 1px solid rgba(244, 237, 230, 0.20);
+    }
+    #g23 .limit .num {
+      font-size: 16px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light);
+      margin: 0 0 14px;
+    }
+    #g23 .limit p {
+      font-size: 18px; line-height: 1.45; color: var(--beige);
+      opacity: 0.85; margin: 0;
+    }
+    #g23 .limit p em { color: var(--green-light); font-style: italic; font-weight: 500; opacity: 1; }
+    #g23 .footer-row { color: var(--beige); }
+    #g23 .footer-row::before { background: rgba(244, 237, 230, 0.20); }
+
+    /* g24 — handoff a Peppe (riusa pattern r14) */
+    #g24 { background: var(--main-green); color: var(--beige); }
+    #g24 .overlay { position: relative; height: 100%; padding: 96px; display: grid; grid-template-rows: auto 1fr auto; row-gap: 48px; }
+    #g24 .eyebrow { color: var(--beige); }
+    #g24 .eyebrow .dot { background: var(--green-light); }
+    #g24 .handoff-block { align-self: center; max-width: 1500px; }
+    #g24 .recap {
+      font-size: 22px; line-height: 1.4; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--beige);
+      opacity: 0.7; margin: 0 0 40px;
+    }
+    #g24 .recap .emph { color: var(--green-light); font-weight: 500; opacity: 1; text-transform: none; }
+    #g24 h1 {
+      font-family: var(--font-sans); font-weight: 500;
+      font-size: 140px; line-height: 0.93;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--beige); margin: 0;
+    }
+    #g24 h1 .accent { color: var(--green-light); }
+    #g24 .next-speaker {
+      margin-top: 40px; font-size: 22px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--cream-warm); opacity: 0.85;
+    }
+    #g24 .footer-row { color: var(--beige); }
+    #g24 .footer-row::before { background: rgba(244, 237, 230, 0.25); }
+
+
+
+    /* ──────────────────────────────────────────────────────────────
+       PEPPE BLOCK (p25-p37) — Xiang 2025, metagenomica soia
+       ────────────────────────────────────────────────────────────── */
+
+    /* p25 — Cover Peppe */
+    #p25 .claim-block { align-self: end; max-width: 1400px; padding-bottom: 60px; }
+    #p25 h1 {
+      font-family: var(--font-sans); font-weight: 500; font-size: 140px;
+      line-height: 0.93; letter-spacing: -0.02em;
+      text-transform: lowercase; color: var(--beige); margin: 0;
+    }
+    #p25 h1 .accent { color: var(--green-light); }
+    #p25 .speaker-tag {
+      margin-bottom: 24px; font-size: 18px; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--cream-warm); opacity: 0.85;
+    }
+
+    /* p26 — Paper Xiang (magazine spread, riusa pattern) */
+    #p26 { background: var(--beige); color: var(--main-green); }
+    #p26 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto 1fr auto;
+      column-gap: 80px; row-gap: 48px;
+    }
+    #p26 .eyebrow { grid-column: 1 / 3; }
+    #p26 .text-col { grid-column: 1; grid-row: 2; align-self: center; }
+    #p26 .paper-col {
+      grid-column: 2; grid-row: 2; align-self: center;
+      max-height: 720px; overflow: hidden; border-radius: 5px;
+      box-shadow: 0 22px 50px rgba(64, 79, 29, 0.15);
+    }
+    #p26 .paper-col img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    #p26 h2 {
+      font-weight: 500; font-size: 60px;
+      line-height: 0.95; letter-spacing: -0.02em;
+      text-transform: lowercase; color: var(--heading-color);
+      margin: 0 0 28px; max-width: 720px;
+    }
+    #p26 .citation {
+      font-size: 16px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light);
+      margin-bottom: 24px;
+    }
+    #p26 .body-text {
+      font-size: 22px; line-height: 1.45;
+      color: var(--green-deep); max-width: 600px; margin: 0;
+    }
+    #p26 .footer-row { grid-column: 1 / 3; color: var(--main-green); }
+    #p26 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* p27 — La domanda (claim glyph) */
+    #p27 { background: var(--main-green); color: var(--beige); }
+    #p27 .hero-media { opacity: 0.35; filter: saturate(0.7); }
+    #p27 .overlay { position: relative; z-index: 2; }
+    #p27 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto 1fr auto; row-gap: 48px;
+    }
+    #p27 .eyebrow { color: var(--beige); }
+    #p27 .eyebrow .dot { background: var(--green-light); }
+    #p27 .claim-block { align-self: center; max-width: 1500px; }
+    #p27 .glyph-claim { font-size: 110px; color: var(--beige); }
+    #p27 .glyph-claim .em { color: var(--green-light); }
+    #p27 .footer-row { color: var(--beige); }
+    #p27 .footer-row::before { background: rgba(244, 237, 230, 0.20); }
+
+    /* p28 — Obiettivo */
+    #p28 { background: var(--beige); color: var(--main-green); }
+    #p28 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto auto 1fr auto; row-gap: 48px;
+    }
+    #p28 h2 {
+      font-weight: 500; font-size: 88px; line-height: 0.95;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--heading-color); margin: 0; max-width: 1500px;
+    }
+    #p28 .obj-body {
+      font-size: 26px; line-height: 1.45; color: var(--green-deep);
+      max-width: 1200px; margin: 0;
+    }
+    #p28 .obj-body strong { font-weight: 500; color: var(--main-green); }
+    #p28 .obj-body em { font-style: italic; color: var(--green-light); font-weight: 500; }
+    #p28 .footer-row { color: var(--main-green); }
+    #p28 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* p29 — Metodi (pipeline 4 cards) */
+    #p29 { background: var(--beige); color: var(--main-green); }
+    #p29 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto auto 1fr auto; row-gap: 56px;
+    }
+    #p29 h2 {
+      font-weight: 500; font-size: 76px; line-height: 0.95;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--heading-color); margin: 0; max-width: 1500px;
+    }
+    #p29 .pipeline-row {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      column-gap: 32px; align-items: stretch; align-self: center;
+    }
+    #p29 .step {
+      background: var(--olive-soft); border-radius: 8px;
+      padding: 36px 28px;
+      display: flex; flex-direction: column; gap: 18px;
+      position: relative;
+    }
+    #p29 .step .icon { width: 56px; height: 56px; color: var(--green-light); }
+    #p29 .step .icon svg { width: 100%; height: 100%; display: block; }
+    #p29 .step .num {
+      font-size: 16px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light); margin: 0;
+    }
+    #p29 .step .title {
+      font-weight: 500; font-size: 26px; line-height: 1.05;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--main-green); margin: 0;
+    }
+    #p29 .step .body {
+      font-size: 16px; line-height: 1.45; color: var(--green-deep); margin: 0;
+    }
+    #p29 .step::after {
+      content: ""; position: absolute; right: -22px; top: 50%;
+      width: 12px; height: 12px;
+      border-top: 2px solid var(--green-light);
+      border-right: 2px solid var(--green-light);
+      transform: translateY(-50%) rotate(45deg);
+    }
+    #p29 .step:last-child::after { display: none; }
+    #p29 .footer-row { color: var(--main-green); }
+    #p29 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* p30 — Strain sharing (hero-verbale gigante + dato) */
+    #p30 { background: var(--beige); color: var(--main-green); }
+    #p30 .hero-media { opacity: 0.25; }
+    #p30 .overlay { position: relative; z-index: 2; }
+    #p30 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto 1fr auto; row-gap: 48px;
+    }
+    #p30 .stat-hero {
+      align-self: center;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 64px;
+      align-items: end;
+    }
+    #p30 .stat-number {
+      font-family: var(--font-sans);
+      font-weight: 400; font-size: 320px;
+      line-height: 0.85; letter-spacing: -0.04em;
+      color: var(--main-green); margin: 0;
+    }
+    #p30 .stat-number .unit {
+      font-size: 140px;
+      color: var(--green-light);
+      vertical-align: top;
+      letter-spacing: -0.04em;
+    }
+    #p30 .stat-caption { align-self: end; padding-bottom: 60px; }
+    #p30 .stat-caption h2 {
+      font-weight: 500; font-size: 44px;
+      line-height: 1.0; letter-spacing: -0.02em;
+      text-transform: lowercase; color: var(--heading-color);
+      margin: 0 0 24px;
+    }
+    #p30 .stat-caption p {
+      font-size: 22px; line-height: 1.4;
+      color: var(--green-deep); max-width: 520px; margin: 0;
+    }
+    #p30 .stat-caption p strong { font-weight: 500; color: var(--main-green); }
+    #p30 .footer-row { color: var(--main-green); }
+    #p30 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* p31 — Klebsiella (hero-verbale tipografica gigante) */
+    #p31 { background: var(--main-green); color: var(--beige); }
+    #p31 .overlay { position: relative; z-index: 2; }
+    #p31 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto 1fr auto; row-gap: 48px;
+    }
+    #p31 .eyebrow { color: var(--beige); }
+    #p31 .eyebrow .dot { background: var(--green-light); }
+    #p31 .name-block { align-self: center; max-width: 1700px; }
+    #p31 .name-eyebrow {
+      font-size: 18px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light);
+      margin: 0 0 24px;
+    }
+    #p31 h1 {
+      font-family: var(--font-sans); font-weight: 500; font-size: 168px;
+      line-height: 0.93; letter-spacing: -0.02em;
+      text-transform: lowercase; color: var(--beige); margin: 0;
+      font-style: italic;
+    }
+    #p31 h1 .accent { color: var(--green-light); font-style: italic; }
+    #p31 .name-tag {
+      margin-top: 36px;
+      font-size: 22px; line-height: 1.4;
+      color: var(--cream-warm); opacity: 0.85;
+      max-width: 1000px;
+    }
+    #p31 .name-tag strong { color: var(--green-light); font-weight: 500; }
+    #p31 .footer-row { color: var(--beige); }
+    #p31 .footer-row::before { background: rgba(244, 237, 230, 0.20); }
+
+    /* p32 — HGT pompe efflusso (manifesto + bars infografica) */
+    #p32 { background: var(--beige); color: var(--main-green); }
+    #p32 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto auto 1fr auto; row-gap: 48px;
+    }
+    #p32 h2 {
+      font-weight: 500; font-size: 76px; line-height: 0.95;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--heading-color); margin: 0; max-width: 1500px;
+    }
+    #p32 h2 .em { color: var(--green-light); }
+    #p32 .efflux-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      column-gap: 40px; align-self: center;
+    }
+    #p32 .efflux-card {
+      background: var(--olive-soft); border-radius: 8px;
+      padding: 36px 32px;
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    #p32 .efflux-card .name {
+      font-size: 14px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light); margin: 0;
+    }
+    #p32 .efflux-card .gene {
+      font-family: 'Menlo', 'Monaco', monospace;
+      font-size: 30px;
+      letter-spacing: -0.01em;
+      color: var(--main-green);
+      margin: 0;
+    }
+    #p32 .efflux-card .desc {
+      font-size: 16px; line-height: 1.4;
+      color: var(--green-deep); margin: 0;
+    }
+    #p32 .efflux-card .bar {
+      height: 8px; background: rgba(64, 79, 29, 0.10);
+      border-radius: 4px; position: relative; overflow: hidden;
+    }
+    #p32 .efflux-card .bar::after {
+      content: ""; position: absolute; inset: 0;
+      width: 0;
+      background: linear-gradient(90deg, var(--main-green), var(--green-light));
+      border-radius: 4px;
+      transition: width 1.4s var(--ease);
+      transition-delay: 0.8s;
+    }
+    #p32.entered .efflux-card:nth-of-type(1) .bar::after { width: 72%; transition-delay: 0.8s; }
+    #p32.entered .efflux-card:nth-of-type(2) .bar::after { width: 58%; transition-delay: 1.0s; }
+    #p32.entered .efflux-card:nth-of-type(3) .bar::after { width: 64%; transition-delay: 1.2s; }
+    #p32 .efflux-card .pct {
+      font-family: var(--font-sans);
+      font-weight: 400; font-size: 48px;
+      line-height: 0.95; letter-spacing: -0.02em;
+      color: var(--main-green); margin: 0;
+    }
+    #p32 .efflux-card .pct .small {
+      font-size: 24px; color: var(--green-light); vertical-align: top;
+    }
+    #p32 .footer-row { color: var(--main-green); }
+    #p32 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* p33 — Pistola fumante (claim glyph dramatico) */
+    #p33 { background: var(--main-green); color: var(--beige); }
+    #p33 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto 1fr auto; row-gap: 48px;
+    }
+    #p33 .eyebrow { color: var(--beige); }
+    #p33 .eyebrow .dot { background: var(--green-light); }
+    #p33 .claim-block { align-self: center; max-width: 1600px; }
+    #p33 .glyph-claim { font-size: 130px; color: var(--beige); }
+    #p33 .glyph-claim .em { color: var(--green-light); }
+    #p33 .footer-row { color: var(--beige); }
+    #p33 .footer-row::before { background: rgba(244, 237, 230, 0.20); }
+
+    /* p34 — Implicazioni (manifesto 3 punti) */
+    #p34 { background: var(--beige); color: var(--main-green); }
+    #p34 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto auto 1fr auto; row-gap: 56px;
+    }
+    #p34 h2 {
+      font-weight: 500; font-size: 76px; line-height: 0.95;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--heading-color); margin: 0; max-width: 1500px;
+    }
+    #p34 .points {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      column-gap: 80px; align-items: start; padding-top: 24px;
+    }
+    #p34 .point .point-num {
+      font-size: 18px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light);
+      margin: 0 0 16px;
+    }
+    #p34 .point .point-title {
+      font-weight: 500; font-size: 38px; line-height: 1.0;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--main-green); margin: 0 0 20px; max-width: 360px;
+    }
+    #p34 .point .point-body {
+      font-size: 19px; line-height: 1.45;
+      color: var(--green-deep); max-width: 380px; margin: 0;
+    }
+    #p34 .point .point-body strong { font-weight: 500; color: var(--main-green); }
+    #p34 .point .point-body em { font-style: italic; color: var(--green-light); font-weight: 500; }
+    #p34 .footer-row { color: var(--main-green); }
+    #p34 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* p35 — Limiti */
+    #p35 { background: var(--main-green); color: var(--beige); }
+    #p35 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto auto 1fr auto; row-gap: 56px;
+    }
+    #p35 .eyebrow { color: var(--beige); }
+    #p35 .eyebrow .dot { background: var(--green-light); }
+    #p35 h2 {
+      font-weight: 500; font-size: 64px; line-height: 0.95;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--beige); margin: 0;
+    }
+    #p35 .limits-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      column-gap: 40px; align-items: start; padding-top: 24px;
+      border-top: 1px solid rgba(244, 237, 230, 0.20);
+    }
+    #p35 .limit .num {
+      font-size: 16px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light); margin: 0 0 14px;
+    }
+    #p35 .limit p {
+      font-size: 18px; line-height: 1.45; color: var(--beige);
+      opacity: 0.85; margin: 0;
+    }
+    #p35 .limit p em { color: var(--green-light); font-style: italic; font-weight: 500; opacity: 1; }
+    #p35 .footer-row { color: var(--beige); }
+    #p35 .footer-row::before { background: rgba(244, 237, 230, 0.20); }
+
+    /* p36 — Conclusione (manifesto stagger 3 take-home) */
+    #p36 { background: var(--beige); color: var(--main-green); }
+    #p36 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto auto 1fr auto; row-gap: 48px;
+    }
+    #p36 h2 {
+      font-weight: 500; font-size: 84px; line-height: 0.95;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--heading-color); margin: 0; max-width: 1500px;
+    }
+    #p36 h2 .em { color: var(--green-light); }
+    #p36 .takeaways {
+      display: flex; flex-direction: column; gap: 32px;
+      align-self: center; max-width: 1500px;
+    }
+    #p36 .takeaway {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      column-gap: 32px;
+      align-items: baseline;
+    }
+    #p36 .takeaway .marker {
+      font-family: var(--font-sans);
+      font-weight: 400; font-size: 80px;
+      line-height: 1.0; letter-spacing: -0.02em;
+      color: var(--green-light);
+    }
+    #p36 .takeaway .body {
+      font-size: 30px; line-height: 1.3;
+      color: var(--main-green); margin: 0;
+    }
+    #p36 .takeaway .body em { font-style: italic; color: var(--green-light); }
+    #p36 .footer-row { color: var(--main-green); }
+    #p36 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* p37 — Grazie + Q&A */
+    #p37 { background: var(--main-green); color: var(--beige); }
+    #p37 .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto 1fr auto; row-gap: 48px;
+    }
+    #p37 .eyebrow { color: var(--beige); }
+    #p37 .eyebrow .dot { background: var(--green-light); }
+    #p37 .thanks-block { align-self: center; max-width: 1700px; }
+    #p37 h1 {
+      font-family: var(--font-sans); font-weight: 500; font-size: 200px;
+      line-height: 0.93; letter-spacing: -0.02em;
+      text-transform: lowercase; color: var(--beige); margin: 0;
+    }
+    #p37 h1 .accent { color: var(--green-light); }
+    #p37 .papers-recap {
+      margin-top: 60px;
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      column-gap: 40px;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cream-warm);
+      opacity: 0.7;
+    }
+    #p37 .papers-recap span { font-weight: 500; }
+    #p37 .footer-row { color: var(--beige); }
+    #p37 .footer-row::before { background: rgba(244, 237, 230, 0.25); }
+
+    /* ──────────────────────────────────────────────────────────────
+       WOW ADDONS — Farm Minerals dynamic effects (CSS only)
+       ────────────────────────────────────────────────────────────── */
+
+    /* 1. Ken Burns: lento zoom + drift sulle hero-media fullbleed.
+          Applicato solo a slide attiva (resource saving). */
+    @keyframes kenBurns {
+      0%   { transform: scale(1.00) translate(0%, 0%); }
+      100% { transform: scale(1.10) translate(-1.5%, 1%); }
+    }
+    .slide.active img.hero-media,
+    .slide.active video.hero-media {
+      animation: kenBurns 22s var(--ease) infinite alternate;
+    }
+
+    /* 2. Slide cinematic transition: aggiunta scale subtle al fade */
+    .slide {
+      transition: opacity 0.7s var(--ease);
+    }
+    .slide:not(.active) {
+      /* Lasciamo il fade come prima; lo scale già viene dal fitDeck JS */
+    }
+
+    /* 3. Dot pattern decorative — signature Farm Minerals (4px glifo)
+          Applicato come decorazione angolare su slide manifesto/title. */
+    .slide.has-dots::before {
+      content: "";
+      position: absolute;
+      top: 96px;
+      right: 96px;
+      width: 60px;
+      height: 60px;
+      background-image:
+        radial-gradient(circle, var(--green-light) 2px, transparent 2.5px);
+      background-size: 18px 18px;
+      background-position: 0 0;
+      opacity: 0.5;
+      z-index: 3;
+      pointer-events: none;
+      animation: dotFade 1s var(--ease) 0.8s both;
+    }
+    @keyframes dotFade {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 0.5; transform: translateY(0); }
+    }
+
+    /* 4. Animated underline sull'accent del titolo: linea sottile lime
+          che si tira sotto la parola accent dopo il reveal del glyph. */
+    .slide.entered #r01 h1 .accent,
+    .slide.entered #r14 h1 .accent,
+    .slide.entered #g24 h1 .accent {
+      position: relative;
+      display: inline-block;
+    }
+    .slide.entered #r01 h1 .accent::after,
+    .slide.entered #r14 h1 .accent::after,
+    .slide.entered #g24 h1 .accent::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      bottom: -8px;
+      height: 4px;
+      background: var(--green-light);
+      transform-origin: left center;
+      transform: scaleX(0);
+      animation: underlineDraw 1.0s var(--ease) 1.6s forwards;
+    }
+    @keyframes underlineDraw {
+      to { transform: scaleX(1); }
+    }
+
+    /* 5. Chapter sticker — small rotated badge top-right indicating chapter */
+    .slide.has-sticker .chapter-sticker {
+      position: absolute;
+      top: 60px; right: 60px;
+      z-index: 4;
+      width: 96px; height: 96px;
+      border: 1px solid var(--green-light);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-sans);
+      font-size: 12px; letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green-light);
+      transform: rotate(-8deg) scale(0);
+      opacity: 0;
+      transition: transform 0.9s var(--ease), opacity 0.6s var(--ease);
+      transition-delay: 0.6s;
+      pointer-events: none;
+    }
+    .slide.entered.has-sticker .chapter-sticker {
+      opacity: 0.85;
+      transform: rotate(-8deg) scale(1);
+    }
+
+    /* 6. Glow pulse subliminale sull'accent glyph (claim) */
+    @keyframes glowPulse {
+      0%, 100% { opacity: 1; text-shadow: none; }
+      50%      { opacity: 0.95; text-shadow: 0 0 18px rgba(124, 145, 76, 0.35); }
+    }
+    .glyph-claim .glyph.em {
+      animation: glowPulse 3s ease-in-out 2s infinite;
+    }
+
+    /* 7. Subtle "scan line" decorative on hero-foto-fullbleed cover (very subtle) */
+    .slide[data-personality="hero-foto-fullbleed"] .hero-shade::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--green-light), transparent);
+      opacity: 0.3;
+      transform: translateY(-50%);
+      animation: scanLine 6s var(--ease) infinite alternate;
+    }
+    @keyframes scanLine {
+      0% { top: 25%; opacity: 0.15; }
+      100% { top: 75%; opacity: 0.35; }
+    }
+
+    /* 8. Eyebrow dot pulse — subliminale heartbeat */
+    @keyframes dotHeartbeat {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.4); }
+    }
+    .slide.entered .eyebrow .dot {
+      animation: dotHeartbeat 2.2s var(--ease) infinite;
+    }
+
+
+
+    /* p32 efflux-card: glow ai bordi quando entered */
+    #p32 .efflux-card {
+      position: relative;
+      transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+    }
+    #p32.entered .efflux-card:nth-of-type(1) {
+      transition-delay: 0.6s;
+      animation: cardLift 0.9s var(--ease) 0.6s both;
+    }
+    #p32.entered .efflux-card:nth-of-type(2) {
+      transition-delay: 0.8s;
+      animation: cardLift 0.9s var(--ease) 0.8s both;
+    }
+    #p32.entered .efflux-card:nth-of-type(3) {
+      transition-delay: 1.0s;
+      animation: cardLift 0.9s var(--ease) 1.0s both;
+    }
+    @keyframes cardLift {
+      from { box-shadow: none; }
+      to   { box-shadow: 0 12px 32px rgba(124, 145, 76, 0.15); }
+    }
+    #p32 .efflux-card .gene {
+      position: relative;
+    }
+    #p32 .efflux-card .gene::before {
+      content: "{";
+      position: absolute;
+      left: -18px; top: 0;
+      color: var(--green-light);
+      opacity: 0.6;
+    }
+    #p32 .efflux-card .gene::after {
+      content: "}";
+      position: absolute;
+      right: -18px; top: 0;
+      color: var(--green-light);
+      opacity: 0.6;
+    }
+
+    /* p30 stat-number glow */
+    #p30.entered .stat-number .count-up {
+      animation: numberGlow 3s ease-in-out 2s infinite;
+    }
+    @keyframes numberGlow {
+      0%, 100% { text-shadow: none; }
+      50%      { text-shadow: 0 0 30px rgba(64, 79, 29, 0.25); }
+    }
+
+    /* p36 takeaway: drop-in più drammatico */
+    #p36 .takeaway {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.7s var(--ease), transform 0.9s var(--ease);
+    }
+    #p36.entered .takeaway:nth-of-type(1) { opacity: 1; transform: translateX(0); transition-delay: 0.4s; }
+    #p36.entered .takeaway:nth-of-type(2) { opacity: 1; transform: translateX(0); transition-delay: 0.7s; }
+    #p36.entered .takeaway:nth-of-type(3) { opacity: 1; transform: translateX(0); transition-delay: 1.0s; }
+    #p36 .takeaway .marker {
+      transition: transform 0.6s var(--ease);
+    }
+    #p36.entered .takeaway:nth-of-type(1) .marker { transform: scale(1); animation: markerPop 0.8s var(--ease) 0.6s both; }
+    #p36.entered .takeaway:nth-of-type(2) .marker { animation: markerPop 0.8s var(--ease) 0.9s both; }
+    #p36.entered .takeaway:nth-of-type(3) .marker { animation: markerPop 0.8s var(--ease) 1.2s both; }
+    @keyframes markerPop {
+      0%   { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+      60%  { transform: scale(1.15) rotate(2deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    /* p27: glyph-claim su image bg - leggera ombra per leggibilità */
+    #p27 .glyph-claim .glyph {
+      text-shadow: 0 2px 14px rgba(31, 37, 9, 0.35);
+    }
+
+    /* p34 points: borders + icons subtle */
+    #p34 .point {
+      position: relative;
+      padding-left: 20px;
+      border-left: 2px solid var(--green-light);
+    }
+    #p34 .point::before {
+      content: "";
+      position: absolute;
+      left: -7px;
+      top: 0;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--green-light);
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       GALLERY VIEW — tasto G per panoramica di tutte le 37 slide
+       ────────────────────────────────────────────────────────────── */
+    #gallery {
+      position: fixed;
+      inset: 0;
+      background: var(--main-green);
+      z-index: 200;
+      overflow-y: auto;
+      padding: 60px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s var(--ease);
+    }
+    #gallery.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    #gallery .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 40px;
+      color: var(--beige);
+      font-family: var(--font-sans);
+    }
+    #gallery .gallery-header h2 {
+      font-weight: 500;
+      font-size: 40px;
+      line-height: 1.0;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+      margin: 0;
+    }
+    #gallery .gallery-header .hint {
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0.6;
+    }
+    #gallery .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 1600px) {
+      #gallery .gallery-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 1200px) {
+      #gallery .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .gallery-item {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: var(--beige);
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+      border: 2px solid transparent;
+    }
+    .gallery-item:hover {
+      transform: scale(1.03);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border-color: var(--green-light);
+    }
+    .gallery-item img,
+    .gallery-item video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .gallery-item .item-meta {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 14px;
+      background: linear-gradient(to top, rgba(31, 37, 9, 0.85), transparent);
+      color: var(--beige);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      z-index: 2;
+    }
+    .gallery-item .item-meta .num {
+      font-weight: 500;
+      color: var(--green-light);
+    }
+    .gallery-item.text-only {
+      background: var(--beige);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .gallery-item.text-only .preview-text {
+      font-family: var(--font-sans);
+      font-weight: 500;
+      font-size: 14px;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      color: var(--main-green);
+      text-transform: lowercase;
+      text-align: center;
+    }
+    .gallery-item.bg-dark {
+      background: var(--main-green);
+    }
+    .gallery-item.bg-dark .preview-text {
+      color: var(--beige);
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       p37 FINALE — video background + glyph cascade wow
+       ────────────────────────────────────────────────────────────── */
+    #p37 {
+      background: var(--main-green);
+      color: var(--beige);
+    }
+    #p37 .finale-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.18;
+      z-index: 0;
+      filter: saturate(0.7);
+    }
+    #p37 .finale-bg-shade {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at center, transparent 0%, rgba(64, 79, 29, 0.55) 60%, rgba(64, 79, 29, 0.95) 100%);
+      z-index: 1;
+    }
+    #p37 .overlay {
+      position: relative;
+      z-index: 2;
+    }
+    #p37 h1 {
+      font-size: 240px;
+      line-height: 0.9;
+    }
+    /* Glyph cascade animation: lettere scendono dall'alto stagger 80ms */
+    #p37 h1 .ch {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(-60px) rotate(-3deg);
+      transition: opacity 0.7s var(--ease), transform 0.9s var(--ease);
+    }
+    #p37.entered h1 .ch {
+      opacity: 1;
+      transform: translateY(0) rotate(0);
+    }
+    /* Stagger via inline transition-delay set by JS */
+    #p37 .papers-recap {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s var(--ease) 2.5s, transform 0.7s var(--ease) 2.5s;
+    }
+    #p37.entered .papers-recap {
+      opacity: 0.7;
+      transform: translateY(0);
+    }
+    /* Subtle pulse on accent */
+    #p37 h1 .accent .ch {
+      animation: accentGlow 2.4s ease-in-out 3.5s infinite;
+    }
+    @keyframes accentGlow {
+      0%, 100% { text-shadow: none; }
+      50% { text-shadow: 0 0 30px rgba(124, 145, 76, 0.55); }
+    }
+
+    /* Hint floating "premi G" indicator */
+    .gallery-trigger-hint {
+      position: fixed;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-sans);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.25);
+      z-index: 99;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       Navigazione (presenter mode minimo)
+       ────────────────────────────────────────────────────────────── */
+    .nav-hint {
+      position: fixed;
+      bottom: 20px;
+      right: 24px;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.35);
+      font-family: var(--font-sans);
+      font-weight: 500;
+      z-index: 100;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .slide-counter {
+      position: fixed;
+      bottom: 20px;
+      left: 24px;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.35);
+      font-family: var(--font-sans);
+      font-weight: 500;
+      z-index: 100;
+      pointer-events: none;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <main id="deck">
+
+    <!-- r01 — Cover -->
+    <section class="slide" id="r01" data-personality="solid-color-concept">
+      <video class="hero-media" autoplay muted playsinline preload="auto" poster="assets/hf-01-campo-grano.jpg">
+        <source src="assets/hf-01-campo-grano.mp4" type="video/mp4">
+      </video>
+
+      <div class="hero-shade diag-tl"></div>
+
+      <div class="hero-overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>microbiologia agricola</span>
+        </div>
+
+        <div class="title-block stagger">
+          <h1>
+            trasferimento<br>
+            <span class="accent">orizzontale</span> di geni
+            <span class="kicker">negli alimenti fermentati</span>
+          </h1>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors">
+            <span>raffaele</span>
+            <span class="dot"></span>
+            <span>giorgio</span>
+            <span class="dot"></span>
+            <span>peppe</span>
+          </span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- r02 — Hook (yogurt nel frigo di casa) -->
+    <section class="slide" id="r02" data-personality="hero-foto-fullbleed">
+      <img class="hero-media" src="assets/r02-yogurt.png" loading="eager" alt="">
+
+      <div class="hero-shade diag-bl"></div>
+
+      <div class="hero-overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 01 — il problema</span>
+        </div>
+
+        <div class="claim-block stagger">
+          <p class="glyph-claim">il problema è nel frigo di casa</p>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors">
+            <span>raffaele</span>
+          </span>
+          <span>r · 02 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- r03 — HGT meccanismi: 3 vie del trasferimento orizzontale -->
+    <section class="slide" id="r03" data-personality="flowchart-orizzontale">
+      <div class="overlay hero-overlay" style="color: var(--main-green);">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 02 — meccanismi</span>
+        </div>
+
+        <div class="title-row stagger">
+          <h2>tre vie del trasferimento orizzontale</h2>
+        </div>
+
+        <div class="mech-row">
+          <div class="mech">
+            <video class="mech-video" autoplay muted loop playsinline preload="auto" poster="assets/r03-coniugazione.png">
+        <source src="assets/r03-coniugazione.mp4" type="video/mp4">
+      </video>
+            <div class="mech-text stagger">
+              <p class="mech-num">01</p>
+              <h3 class="mech-name">coniugazione</h3>
+              <p class="mech-desc">contatto diretto tra due cellule via pilo; il plasmide migra dal donatore al ricevente.</p>
+            </div>
+          </div>
+
+          <div class="mech">
+            <video class="mech-video" autoplay muted loop playsinline preload="auto" poster="assets/r03-trasformazione.png">
+        <source src="assets/r03-trasformazione.mp4" type="video/mp4">
+      </video>
+            <div class="mech-text stagger">
+              <p class="mech-num">02</p>
+              <h3 class="mech-name">trasformazione</h3>
+              <p class="mech-desc">il batterio assorbe frammenti di dna libero rilasciati da cellule morte nell'ambiente.</p>
+            </div>
+          </div>
+
+          <div class="mech">
+            <video class="mech-video" autoplay muted loop playsinline preload="auto" poster="assets/r03-trasduzione.png">
+        <source src="assets/r03-trasduzione.mp4" type="video/mp4">
+      </video>
+            <div class="mech-text stagger">
+              <p class="mech-num">03</p>
+              <h3 class="mech-name">trasduzione</h3>
+              <p class="mech-desc">un batteriofago trasporta inavvertitamente dna batterico da una cellula all'altra.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors">
+            <span>raffaele</span>
+          </span>
+          <span>r · 03 / 14</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- r04 — Plasmidi (schema-scientifico-fullbleed) -->
+    <section class="slide" id="r04" data-personality="schema-scientifico-fullbleed">
+      <div class="overlay hero-overlay" style="color: var(--main-green);">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 03 — plasmidi</span>
+        </div>
+
+        <video class="schema-video" autoplay muted loop playsinline preload="auto" poster="assets/r04-plasmide.png">
+        <source src="assets/r04-plasmide.mp4" type="video/mp4">
+      </video>
+
+        <div class="desc-block stagger">
+          <h2>il plasmide è un veicolo, non una parentesi.</h2>
+          <p class="desc-body">elementi genetici extracromosomici circolari che portano geni accessori — resistenza, virulenza, metabolismi. si replicano in autonomia e attraversano specie diverse.</p>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele</span></span>
+          <span>r · 04 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- r05 — LAB negli alimenti (hero-foto-fullbleed) -->
+    <section class="slide" id="r05" data-personality="hero-foto-fullbleed">
+      <img class="hero-media" src="assets/r05-alimenti.png" loading="eager" alt="">
+      <div class="hero-shade diag-bl"></div>
+      <div class="hero-overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 04 — lab × alimenti</span>
+        </div>
+        <div class="claim-block stagger">
+          <p class="glyph-claim">i fermenti che ami sono anche un veicolo</p>
+          <p class="subhead">i batteri lattici — protagonisti del formaggio, dello yogurt, dei salumi — condividono lo stesso ambiente dei patogeni opportunisti.</p>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele</span></span>
+          <span>r · 05 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- r06 — Zinno paper (magazine-paper-spread) -->
+    <section class="slide" id="r06" data-personality="magazine-paper-spread">
+      <div class="overlay hero-overlay" style="color: var(--main-green);">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 05 — il paper di zinno</span>
+        </div>
+
+        <div class="text-col stagger">
+          <p class="citation">zinno et al. · 2023 · food microbiology</p>
+          <h2>cercavano il gene tet(m) nei lab dei formaggi italiani.</h2>
+          <p class="body-text">obiettivo: misurare la presenza di geni di resistenza a tetracicline negli starter caseari, lievito naturale del nostro patrimonio fermentativo, e tracciarne il rischio di trasferimento orizzontale.</p>
+        </div>
+
+        <div class="paper-col stagger">
+          <img src="assets/r06-zinno-paper.png" alt="">
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele</span></span>
+          <span>r · 06 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- r07 — Zinno metodi (pipeline 4 step cards CSS) -->
+    <section class="slide" id="r07" data-personality="flowchart-orizzontale">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 05 — metodi</span>
+        </div>
+
+        <h2 class="stagger">dal formaggio al gene, in quattro passi.</h2>
+
+        <div class="pipeline-row">
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><circle cx="28" cy="28" r="20"/><path d="M16 28h24M28 16v24"/></svg></div>
+            <p class="num">01 · raccolta</p>
+            <p class="title">campioni caseari</p>
+            <p class="body">120 starter da 9 specie LAB (lactobacillus, streptococcus, enterococcus) da formaggi di 3 regioni italiane.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><rect x="22" y="6" width="12" height="36" rx="2"/><path d="M24 38h8M22 14h12"/><path d="M22 42c0 4 4 8 6 8s6-4 6-8"/></svg></div>
+            <p class="num">02 · coltura</p>
+            <p class="title">isolamento lab</p>
+            <p class="body">selezione su MRS e M17 agar, conferma per via fenotipica + sequenziamento 16S rRNA.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 10c8 6 16 6 24 0M16 46c8-6 16-6 24 0M18 14l20 28M38 14L18 42"/></svg></div>
+            <p class="num">03 · pcr</p>
+            <p class="title">screening tet(m)</p>
+            <p class="body">amplificazione gene tet(m) (~700 bp) + sequencing per identificare varianti e contesto trasposonico.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="5"/><circle cx="38" cy="38" r="5"/><path d="M12 44L44 12"/></svg></div>
+            <p class="num">04 · risultato</p>
+            <p class="title">positivi 67/120</p>
+            <p class="body">56% dei campioni porta tet(m) integrato in Tn916, confermato come trasposone coniugativo attivo.</p>
+          </div>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele</span></span>
+          <span>r · 07 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- r08 — 56% dairy (hero-verbale-gigante + count-up animation) -->
+    <section class="slide has-dots" id="r08" data-personality="hero-verbale-gigante">
+      <div class="overlay hero-overlay" style="color: var(--main-green);">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 06 — risultato</span>
+        </div>
+
+        <div class="stat-hero stagger">
+          <p class="stat-number"><span class="count-up" data-target="56" data-duration="1800">0</span><span class="pct">%</span></p>
+          <div class="stat-caption">
+            <h2>dei campioni caseari portano tet(m).</h2>
+            <p>più della metà degli starter analizzati ospita il gene di resistenza alle tetracicline — pronto a circolare.</p>
+          </div>
+        </div>
+
+        <div class="stat-grid stagger">
+          <div class="cell">
+            <p class="num"><span class="count-up" data-target="120" data-duration="1400">0</span></p>
+            <p class="lbl">campioni analizzati</p>
+          </div>
+          <div class="cell">
+            <p class="num"><span class="count-up" data-target="67" data-duration="1400">0</span></p>
+            <p class="lbl">positivi tet(m)</p>
+          </div>
+          <div class="cell">
+            <p class="num"><span class="count-up" data-target="9" data-duration="1200">0</span></p>
+            <p class="lbl">specie lab coinvolte</p>
+          </div>
+          <div class="cell">
+            <p class="num"><span class="count-up" data-target="3" data-duration="1000">0</span></p>
+            <p class="lbl">regioni d'italia</p>
+          </div>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele</span></span>
+          <span>r · 08 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- r09 — Tn916 il salto del gene (split layout chiarito) -->
+    <section class="slide" id="r09" data-personality="schema-scientifico-fullbleed">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 07 — il salto del gene</span>
+        </div>
+
+        <div class="text-col stagger">
+          <p class="r09-citation">tn916 · 18 kb · trasposone coniugativo</p>
+          <h2>tet(m) non sta fermo: viaggia.</h2>
+          <p class="caption"><strong>tn916</strong> si stacca dal cromosoma del donatore grazie all'integrasi <em>int</em>, viene trasferito per coniugazione, e si reintegra in un nuovo ospite. È <em>autosufficiente</em>: porta con sé tutto il macchinario molecolare (<em>int</em>, <em>xis</em>, <em>tra</em>, <em>ori-T</em>) per saltare di specie in specie.</p>
+        </div>
+
+        <video class="schema-video" autoplay muted loop playsinline preload="auto" poster="assets/r09-tn916.png">
+          <source src="assets/r09-tn916.mp4" type="video/mp4">
+        </video>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele</span></span>
+          <span>r · 09 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- r10 — Coniugazione macro (video-dominante-cinematic) -->
+    <section class="slide" id="r10" data-personality="video-dominante-cinematic">
+      <video class="hero-media" autoplay muted playsinline preload="auto" poster="assets/r10-coniugazione-macro.jpg">
+        <source src="assets/r10-coniugazione-macro.mp4" type="video/mp4">
+      </video>
+      <div class="hero-shade diag-bl"></div>
+
+      <div class="hero-overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 08 — coniugazione in vivo</span>
+        </div>
+
+        <div class="claim-block stagger">
+          <p class="glyph-claim">il contatto avviene davvero, nel cibo.</p>
+          <p class="caption">zinno ha dimostrato in vitro che lab e patogeni coniugano nel siero del formaggio — non solo ipotesi, ma scambio osservato.</p>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele</span></span>
+          <span>r · 10 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- r11 — Evidenze (manifesto-tipografico arricchito) -->
+    <section class="slide has-dots" id="r11" data-personality="manifesto-tipografico">
+      <div class="overlay hero-overlay" style="color: var(--main-green);">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 09 — cosa abbiamo capito</span>
+        </div>
+
+        <h2 class="stagger">tre evidenze, una storia.</h2>
+
+        <div class="points">
+          <div class="point stagger">
+            <p class="point-num">01 · diffusione</p>
+            <p class="point-title">il gene è dove non guardavamo.</p>
+            <p class="point-body"><strong>67/120 campioni positivi a tet(m)</strong> — il 56% degli starter caseari italiani analizzati. Nove specie LAB coinvolte (L. plantarum, L. paracasei, S. thermophilus, E. faecium tra le principali). Non un'eccezione, ma <em>una costante</em> nel patrimonio fermentativo nazionale.</p>
+          </div>
+          <div class="point stagger">
+            <p class="point-num">02 · mobilità</p>
+            <p class="point-title">il vettore è già pronto.</p>
+            <p class="point-body"><strong>tet(m) è integrato in Tn916</strong>, trasposone coniugativo di 18 kb. Possiede già <em>tutto il macchinario</em> per l'excisione, il trasferimento orizzontale e la reintegrazione: <code>int</code>, <code>xis</code>, <code>tra</code> e <code>ori-T</code>. Nessuna barriera molecolare resta.</p>
+          </div>
+          <div class="point stagger">
+            <p class="point-num">03 · contatto</p>
+            <p class="point-title">il trasferimento avviene davvero.</p>
+            <p class="point-body"><strong>Zinno ha osservato la coniugazione in vitro</strong> tra ceppi LAB donatori e Enterococcus faecalis ricevente nel siero del formaggio simulato. Efficienza misurata: <em>10⁻⁶ – 10⁻⁴ transconiuganti per donatore</em>. Lo scambio non è teorico — è documentato.</p>
+          </div>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele</span></span>
+          <span>r · 11 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- r12 — Limiti (denser, with claim + 4 limits + implication) -->
+    <section class="slide" id="r12" data-personality="manifesto-tipografico">
+      <div class="overlay hero-overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 10 — i confini dello studio</span>
+        </div>
+
+        <div class="claim-block stagger">
+          <p class="glyph-claim">manca <span class="em">la prova</span> in vivo</p>
+        </div>
+
+        <div class="limits-grid">
+          <div class="limit stagger">
+            <p class="num">01 · scala</p>
+            <p>Tutto in vitro, in siero ricostituito di formaggio. Nessun dato su intestino umano reale né su matrici alimentari complete. <em>Il passaggio mucosa→sistemico resta da dimostrare.</em></p>
+          </div>
+          <div class="limit stagger">
+            <p class="num">02 · ceppi</p>
+            <p>9 specie LAB testate, una manciata di patogeni riceventi. La varietà reale del microbiota alimentare include centinaia di taxa. <em>L'efficienza media potrebbe essere sotto- o sovra-stimata.</em></p>
+          </div>
+          <div class="limit stagger">
+            <p class="num">03 · tempo</p>
+            <p>Colture brevi (24–48 h). I tempi reali di transito gastrointestinale variano da ore a giorni. <em>Più tempo = più finestra per la coniugazione.</em></p>
+          </div>
+          <div class="limit stagger">
+            <p class="num">04 · dose</p>
+            <p>Concentrazioni di LAB 10⁸–10⁹ CFU/ml, ben sopra la fisiologia normale dopo digestione. <em>Serve replicare in condizioni alimentari realistiche.</em></p>
+          </div>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele</span></span>
+          <span>r · 12 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- r13 — Ponte ai compagni (paper-cards-side-by-side) -->
+    <section class="slide" id="r13" data-personality="paper-cards-side-by-side">
+      <div class="overlay hero-overlay" style="color: var(--main-green);">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 11 — il ponte</span>
+        </div>
+
+        <h2 class="stagger">due paper raccolgono il filo: salumi e microbiota.</h2>
+
+        <div class="papers">
+          <div class="paper-card stagger">
+            <div class="paper-cover">
+              <img src="assets/r13-diaz-salumi.png" alt="">
+            </div>
+            <p class="paper-citation">diaz et al. · 2025 · food microbiology</p>
+            <p class="paper-title">salumi spagnoli: arg in matrice carnea stagionata.</p>
+            <p class="paper-speaker">→ giorgio</p>
+          </div>
+          <div class="paper-card stagger">
+            <div class="paper-cover">
+              <img src="assets/r13-xiang-microbiota.png" alt="">
+            </div>
+            <p class="paper-citation">xiang et al. · 2025 · microbiome</p>
+            <p class="paper-title">metagenomica: arg nel microbioma dei fermentati.</p>
+            <p class="paper-speaker">→ peppe</p>
+          </div>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele</span></span>
+          <span>r · 13 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- r14 — Handoff (riccohido + reveal cinematic) -->
+    <section class="slide" id="r14" data-personality="solid-color-concept">
+      <div class="reveal-bg"></div>
+      <div class="reveal-stage">
+        <div class="reveal-line first"></div>
+        <div class="reveal-line second"></div>
+        <div class="reveal-line third"></div>
+      </div>
+
+      <div class="overlay hero-overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>fine capitolo · raffaele</span>
+        </div>
+
+        <div class="handoff-block stagger">
+          <p class="recap">finora: <span class="emph">il gene c'è, il vettore è pronto, lo scambio è documentato.</span></p>
+          <h1>passo la parola<br><span class="accent">a giorgio.</span></h1>
+          <p class="next-speaker">→ salumi spagnoli, arg in matrice carnea stagionata · diaz 2025</p>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele · giorgio · peppe</span></span>
+          <span>r · 14 / 14</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ===== BLOCCO GIORGIO ===== -->
+
+    <!-- g15 — Cover Giorgio -->
+    <section class="slide" id="g15" data-personality="hero-foto-fullbleed">
+      <video class="hero-media" autoplay muted playsinline preload="auto" poster="assets/g15-cover-salumi.png">
+        <source src="assets/g15-cover-salumi.mp4" type="video/mp4">
+      </video>
+      <div class="hero-shade diag-bl"></div>
+      <div class="hero-overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 13 — giorgio</span>
+        </div>
+        <div class="claim-block stagger">
+          <p class="speaker-tag">díaz 2025 · meat science</p>
+          <h1>i salumi spagnoli<br>portano <span class="accent">arg</span>.</h1>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>giorgio</span></span>
+          <span>g · 15 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- g16 — Paper Diaz -->
+    <section class="slide" id="g16" data-personality="magazine-paper-spread">
+      <div class="overlay hero-overlay" style="color: var(--main-green);">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 14 — il paper</span>
+        </div>
+        <div class="text-col stagger">
+          <p class="citation">díaz-martínez et al. · 2025 · meat science 232</p>
+          <h2>150 campioni di salumi spagnoli, una domanda sola.</h2>
+          <p class="body-text">Il tipo di prodotto e la stagionatura influenzano i profili di resistenza dei batteri lattici? Studio originale dell'università di córdoba, fresco di pubblicazione (novembre 2025).</p>
+        </div>
+        <div class="paper-col stagger">
+          <img src="assets/g16-diaz-paper.png" alt="">
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>giorgio</span></span>
+          <span>g · 16 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- g17 — Problema MDR -->
+    <section class="slide has-dots" id="g17" data-personality="hero-verbale-gigante">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 15 — il problema</span>
+        </div>
+        <div class="stat-hero stagger">
+          <p class="stat-number"><span class="count-up" data-target="68" data-duration="1800">0</span><span class="pct">%</span></p>
+          <div class="stat-caption">
+            <h2>dei lab nei salumi è multiresistente.</h2>
+            <p>oltre due terzi degli isolati mostra resistenza a 3 o più antibiotici diversi — un reservoir silenzioso nel cibo quotidiano.</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>giorgio</span></span>
+          <span>g · 17 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- g18 — Obiettivo (claim glyph) -->
+    <section class="slide" id="g18" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 16 — la domanda</span>
+        </div>
+        <div class="claim-block stagger">
+          <p class="glyph-claim">cosa pesa <span class="em">davvero</span> sulla resistenza?</p>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>giorgio</span></span>
+          <span>g · 18 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- g19 — Metodi (pipeline cards) -->
+    <section class="slide" id="g19" data-personality="flowchart-orizzontale">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 17 — metodi</span>
+        </div>
+        <h2 class="stagger">dal salume all'antibiogramma, in quattro passi.</h2>
+        <div class="pipeline-row">
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="14" width="40" height="28" rx="3"/><path d="M16 14V8h24v6"/></svg></div>
+            <p class="num">01 · raccolta</p>
+            <p class="title">150 campioni</p>
+            <p class="body">Salumi spagnoli (jamón serrano, chorizo, salchichón, fuet) da più regioni iberiche.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><rect x="22" y="6" width="12" height="36" rx="2"/><path d="M22 14h12M22 42c0 4 4 8 6 8s6-4 6-8"/></svg></div>
+            <p class="num">02 · isolamento</p>
+            <p class="title">lab + enterococchi</p>
+            <p class="body">Selezione su MRS, M17, BEAA. Conferma fenotipica + sequencing 16S rRNA.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><circle cx="28" cy="28" r="22"/><circle cx="20" cy="22" r="3"/><circle cx="36" cy="22" r="3"/><circle cx="28" cy="38" r="3"/><circle cx="18" cy="36" r="3"/><circle cx="38" cy="36" r="3"/></svg></div>
+            <p class="num">03 · kirby-bauer</p>
+            <p class="title">13 antibiotici</p>
+            <p class="body">Diffusione su disco: tetraciclina, eritromicina, vancomicina, ciprofloxacina, cefotaxima e altri.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 48h40M14 38l8-12 6 8 10-18 8 14"/><circle cx="14" cy="38" r="2"/><circle cx="22" cy="26" r="2"/><circle cx="28" cy="34" r="2"/><circle cx="38" cy="16" r="2"/><circle cx="46" cy="30" r="2"/></svg></div>
+            <p class="num">04 · mar index</p>
+            <p class="title">multiresistenza</p>
+            <p class="body">Calcolo dell'indice MAR (Multiple Antibiotic Resistance) per ogni isolato e classificazione MDR.</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>giorgio</span></span>
+          <span>g · 19 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- g20 — Risultato enterococchi resistenti (3 antibiotici) -->
+    <section class="slide has-dots" id="g20" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 18 — risultato 1</span>
+        </div>
+        <h2 class="stagger">gli enterococchi sono <span class="em">i più resistenti</span>.</h2>
+        <div class="resist-grid">
+          <div class="resist-card stagger" style="--bar-fill: 92%;">
+            <p class="name">cefotaxima</p>
+            <p class="pct"><span class="count-up" data-target="92" data-duration="1600">0</span><span class="small">%</span></p>
+            <div class="bar"></div>
+            <p class="desc">cefalosporina di iii generazione — picco di resistenza tra gli enterococchi isolati.</p>
+          </div>
+          <div class="resist-card stagger" style="--bar-fill: 78%;">
+            <p class="name">tetraciclina</p>
+            <p class="pct"><span class="count-up" data-target="78" data-duration="1600">0</span><span class="small">%</span></p>
+            <div class="bar"></div>
+            <p class="desc">stessa famiglia del paper di zinno — tet(m) è ovunque negli alimenti fermentati.</p>
+          </div>
+          <div class="resist-card stagger" style="--bar-fill: 64%;">
+            <p class="name">eritromicina</p>
+            <p class="pct"><span class="count-up" data-target="64" data-duration="1600">0</span><span class="small">%</span></p>
+            <div class="bar"></div>
+            <p class="desc">macrolide, usato in clinica per infezioni respiratorie e cutanee.</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>giorgio</span></span>
+          <span>g · 20 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- g21 — Effetto stagionatura -->
+    <section class="slide has-dots" id="g21" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 19 — risultato 2</span>
+        </div>
+        <h2 class="stagger">la stagionatura cambia il profilo di resistenza.</h2>
+        <div class="compare">
+          <div class="compare-card stagger">
+            <div class="compare-img"><img src="assets/g21-jamon-lungo.png" alt="" loading="eager"></div>
+            <p class="label">stagionatura lunga</p>
+            <p class="duration">12 – 24 mesi</p>
+            <p class="resistant">resistenza più alta a <strong>tetraciclina</strong> ed <strong>eritromicina</strong>. tempo lungo = pressione selettiva costante sui geni mobili classici degli alimenti fermentati.</p>
+            <div class="mini-bars">
+              <div class="mini-row"><span class="mini-lbl">tetraciclina</span><div class="mini-bar" style="--w: 88%"><span></span></div><span class="mini-pct">88%</span></div>
+              <div class="mini-row"><span class="mini-lbl">eritromicina</span><div class="mini-bar" style="--w: 76%"><span></span></div><span class="mini-pct">76%</span></div>
+              <div class="mini-row"><span class="mini-lbl">vancomicina</span><div class="mini-bar" style="--w: 28%"><span></span></div><span class="mini-pct">28%</span></div>
+              <div class="mini-row"><span class="mini-lbl">ciprofloxacina</span><div class="mini-bar" style="--w: 22%"><span></span></div><span class="mini-pct">22%</span></div>
+            </div>
+          </div>
+          <div class="compare-card stagger">
+            <div class="compare-img"><img src="assets/g21-chorizo-breve.png" alt="" loading="eager"></div>
+            <p class="label">stagionatura breve</p>
+            <p class="duration">0 – 4 settimane</p>
+            <p class="resistant">resistenza più alta a <strong>vancomicina</strong> e <strong>ciprofloxacina</strong>. tempo breve = patrimonio di starter commerciali pre-esistente, meno modulato dall'ambiente di stagionatura.</p>
+            <div class="mini-bars">
+              <div class="mini-row"><span class="mini-lbl">tetraciclina</span><div class="mini-bar" style="--w: 35%"><span></span></div><span class="mini-pct">35%</span></div>
+              <div class="mini-row"><span class="mini-lbl">eritromicina</span><div class="mini-bar" style="--w: 32%"><span></span></div><span class="mini-pct">32%</span></div>
+              <div class="mini-row"><span class="mini-lbl">vancomicina</span><div class="mini-bar" style="--w: 71%"><span></span></div><span class="mini-pct">71%</span></div>
+              <div class="mini-row"><span class="mini-lbl">ciprofloxacina</span><div class="mini-bar" style="--w: 64%"><span></span></div><span class="mini-pct">64%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>giorgio</span></span>
+          <span>g · 21 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- g22 — Implicazioni consumatore (hero-foto fullbleed con claim) -->
+    <section class="slide" id="g22" data-personality="hero-foto-fullbleed">
+      <img class="hero-media" src="assets/g22-consumatore.png" alt="" loading="eager">
+      <div class="hero-shade diag-bl"></div>
+      <div class="hero-overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 20 — implicazioni</span>
+        </div>
+        <div class="claim-block stagger">
+          <p class="glyph-claim">ogni fetta porta con sé un reservoir.</p>
+          <p class="subhead">chi mangia salumi fermentati introduce nel proprio intestino lab multiresistenti — non più un'astrazione di laboratorio, ma una pratica quotidiana.</p>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>giorgio</span></span>
+          <span>g · 22 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- g23 — Limiti -->
+    <section class="slide has-dots" id="g23" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 21 — limiti</span>
+        </div>
+        <h2 class="stagger">tre cose che il paper non risolve.</h2>
+        <div class="limits-grid">
+          <div class="limit stagger">
+            <p class="num">01 · meccanismo</p>
+            <p>resistenza fenotipica testata (kirby-bauer), ma <em>i geni specifici non sequenziati</em>. non sappiamo quali arg precisi sono coinvolti.</p>
+          </div>
+          <div class="limit stagger">
+            <p class="num">02 · trasferimento</p>
+            <p>presenza dimostrata, <em>ma non l'hgt verso patogeni umani</em>. resta da provare il passaggio nell'intestino.</p>
+          </div>
+          <div class="limit stagger">
+            <p class="num">03 · scala europea</p>
+            <p>solo prodotti spagnoli, una sola regione di origine. <em>serve estensione ad altri salumi mediterranei</em> per generalizzare.</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>giorgio</span></span>
+          <span>g · 23 / 14</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- g24 — Handoff a Peppe -->
+    <section class="slide" id="g24" data-personality="solid-color-concept">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>fine capitolo · giorgio</span>
+        </div>
+        <div class="handoff-block stagger">
+          <p class="recap">finora: <span class="emph">il gene c'è (zinno), i salumi sono mdr (díaz).</span> ma quanto arriva davvero nel microbioma intestinale?</p>
+          <h1>passo la parola<br><span class="accent">a peppe.</span></h1>
+          <p class="next-speaker">→ metagenomica del microbioma e arg · xiang 2025</p>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele · giorgio · peppe</span></span>
+          <span>g · 24 / 14</span>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ===== BLOCCO PEPPE ===== -->
+
+    <!-- p25 — Cover Peppe -->
+    <section class="slide" id="p25" data-personality="hero-foto-fullbleed">
+      <video class="hero-media" autoplay muted playsinline preload="auto" poster="assets/p25-cover-soy.png">
+        <source src="assets/p25-cover-soy.mp4" type="video/mp4">
+      </video>
+      <div class="hero-shade diag-bl"></div>
+      <div class="hero-overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 22 — peppe</span>
+        </div>
+        <div class="claim-block stagger">
+          <p class="speaker-tag">xiang 2025 · npj biofilms & microbiomes</p>
+          <h1>il cibo<br>colonizza <span class="accent">l'intestino</span>.</h1>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 25 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p26 — Paper Xiang -->
+    <section class="slide" id="p26" data-personality="magazine-paper-spread">
+      <div class="overlay hero-overlay" style="color: var(--main-green);">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 23 — il paper</span>
+        </div>
+        <div class="text-col stagger">
+          <p class="citation">xiang et al. · 2025 · npj biofilms & microbiomes 11</p>
+          <h2>93 campioni di cibo fermentato cinese, tracciati nel microbioma intestinale.</h2>
+          <p class="body-text">Metagenomica shotgun di douchi, sufu, stinky tofu — la prima prova sperimentale del trasferimento orizzontale di ARG dal cibo all'intestino. Pubblicato nature group, luglio 2025.</p>
+        </div>
+        <div class="paper-col stagger">
+          <img src="assets/p26-xiang-paper.png" alt="">
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 26 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p27 — La domanda chiave (con image bg microbiome) -->
+    <section class="slide" id="p27" data-personality="manifesto-tipografico">
+      <img class="hero-media" src="assets/p27-gut-microbiome.png" alt="" loading="eager">
+      <div class="hero-shade diag-bl"></div>
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 24 — la domanda</span>
+        </div>
+        <div class="claim-block stagger">
+          <p class="glyph-claim">quando li mangiamo, <span class="em">passano davvero</span>?</p>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 27 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p28 — Obiettivo -->
+    <section class="slide" id="p28" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 25 — obiettivo</span>
+        </div>
+        <h2 class="stagger">prove molecolari, non più ipotesi.</h2>
+        <p class="obj-body stagger">tracciare i ceppi batterici e i geni di resistenza <strong>dal cibo fermentato cinese al microbiota intestinale umano</strong>, usando la <em>metagenomica shotgun</em> — sequenziamento dell'intero DNA microbico, non solo del 16S rRNA. Per la prima volta a livello di ceppo e gene.</p>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 28 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p29 — Metodi pipeline -->
+    <section class="slide has-dots" id="p29" data-personality="flowchart-orizzontale">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 26 — metodi</span>
+        </div>
+        <h2 class="stagger">dalla salsa di soia al microbioma intestinale.</h2>
+        <div class="pipeline-row">
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><rect x="10" y="20" width="36" height="26" rx="2"/><path d="M18 20v-6h20v6"/><circle cx="22" cy="33" r="2"/><circle cx="28" cy="36" r="2"/><circle cx="34" cy="32" r="2"/></svg></div>
+            <p class="num">01 · raccolta</p>
+            <p class="title">93 campioni</p>
+            <p class="body">Cibi fermentati di soia tradizionali cinesi: douchi, sufu, stinky tofu da diverse province.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><path d="M28 8v40M8 28h40"/><circle cx="28" cy="28" r="20"/><path d="M14 14l28 28M14 42l28-28"/></svg></div>
+            <p class="num">02 · metagenomica</p>
+            <p class="title">shotgun seq</p>
+            <p class="body">Sequenziamento dell'intero DNA microbico — non solo 16S, ma TUTTI i geni di TUTTI i batteri.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><circle cx="28" cy="28" r="20"/><path d="M16 28a12 12 0 0124 0M28 16v24"/></svg></div>
+            <p class="num">03 · confronto</p>
+            <p class="title">gut metagenomi</p>
+            <p class="body">Confronto strain-by-strain con metagenomi del microbiota intestinale cinese pubblicati.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 28h12l4-12 8 24 4-12h12"/><circle cx="28" cy="28" r="3"/></svg></div>
+            <p class="num">04 · hgt analysis</p>
+            <p class="title">arg tracking</p>
+            <p class="body">Identificazione di eventi di trasferimento orizzontale di geni di resistenza tra cibo e gut.</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 29 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p30 — Strain sharing (stat hero con petri bg) -->
+    <section class="slide has-dots" id="p30" data-personality="hero-verbale-gigante">
+      <img class="hero-media" src="assets/p30-food-gut-bridge.png" alt="" loading="eager">
+      <div class="hero-shade diag-tl"></div>
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 27 — risultato 1</span>
+        </div>
+        <div class="stat-hero stagger">
+          <p class="stat-number"><span class="count-up" data-target="42" data-duration="1800">0</span><span class="unit">ceppi</span></p>
+          <div class="stat-caption">
+            <h2>identici tra cibo e intestino umano.</h2>
+            <p>la metagenomica ha trovato <strong>42 ceppi batterici geneticamente identici</strong> sia nei prodotti di soia sia nel microbiota intestinale cinese — non parenti, gli <em>stessi</em> ceppi.</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 30 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p31 — Klebsiella -->
+    <section class="slide" id="p31" data-personality="hero-verbale-gigante">
+      <img class="hero-media" src="assets/p31-klebsiella-petri.png" alt="" loading="eager">
+      <div class="hero-shade diag-tl"></div>
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 28 — risultato 2</span>
+        </div>
+        <div class="name-block stagger">
+          <p class="name-eyebrow">patogeno · multiresistente · trovato</p>
+          <h1>klebsiella<br><span class="accent">pneumoniae</span>.</h1>
+          <p class="name-tag">identificata in <strong>più campioni di cibo fermentato</strong> — patogeno nosocomiale classico, responsabile di polmoniti, sepsi e infezioni urinarie ospedaliere. anche la cugina <em>K. quasipneumoniae</em> è stata trovata.</p>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 31 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p32 — HGT pompe di efflusso -->
+    <section class="slide" id="p32" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 29 — risultato 3</span>
+        </div>
+        <h2 class="stagger">le <span class="em">pompe di efflusso</span> sono passate al gut.</h2>
+        <div class="efflux-grid">
+          <div class="efflux-card stagger">
+            <p class="name">famiglia</p>
+            <p class="gene">acrAB-tolC</p>
+            <p class="pct"><span class="count-up" data-target="72" data-duration="1400">0</span><span class="small">%</span></p>
+            <div class="bar"></div>
+            <p class="desc">pompa di efflusso multi-substrato — confera resistenza a tetracicline, fluorochinoloni, beta-lattamici contemporaneamente.</p>
+          </div>
+          <div class="efflux-card stagger">
+            <p class="name">famiglia</p>
+            <p class="gene">mdtABC</p>
+            <p class="pct"><span class="count-up" data-target="58" data-duration="1400">0</span><span class="small">%</span></p>
+            <div class="bar"></div>
+            <p class="desc">trasportatore MFS — efflusso di antibiotici aminoglicosidici e antisettici comuni nelle cliniche.</p>
+          </div>
+          <div class="efflux-card stagger">
+            <p class="name">famiglia</p>
+            <p class="gene">tetA / tetK</p>
+            <p class="pct"><span class="count-up" data-target="64" data-duration="1400">0</span><span class="small">%</span></p>
+            <div class="bar"></div>
+            <p class="desc">pompa specifica per tetracicline — la stessa famiglia di geni del paper di zinno, qui trovata trasferita.</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 32 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p33 — Pistola fumante (claim dramatico) -->
+    <section class="slide" id="p33" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 30 — sintesi</span>
+        </div>
+        <div class="claim-block stagger">
+          <p class="glyph-claim">il cerchio <span class="em">si chiude</span>.</p>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 33 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p34 — Implicazioni 3 punti -->
+    <section class="slide has-dots" id="p34" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 31 — cosa significa</span>
+        </div>
+        <h2 class="stagger">tre conseguenze, una sola direzione.</h2>
+        <div class="points">
+          <div class="point stagger">
+            <p class="point-num">01 · prova</p>
+            <p class="point-title">non più solo teoria.</p>
+            <p class="point-body"><strong>strain-sharing dimostrato a livello molecolare</strong>. zinno ipotizzava, díaz osservava in vitro, xiang <em>quantifica nel sistema reale</em>.</p>
+          </div>
+          <div class="point stagger">
+            <p class="point-num">02 · vettore</p>
+            <p class="point-title">il cibo è una via attiva.</p>
+            <p class="point-body">le pompe di efflusso multi-resistenza sono trasferite dal cibo al microbiota. <em>una sola dose</em> può veicolare resistenze a più antibiotici insieme.</p>
+          </div>
+          <div class="point stagger">
+            <p class="point-num">03 · sorveglianza</p>
+            <p class="point-title">i protocolli sono obsoleti.</p>
+            <p class="point-body">i metodi standard (conta UFC, terreni selettivi) non vedono ARG né HGT. <em>serve metagenomica nei controlli alimentari</em>, non solo nell'epidemiologia clinica.</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 34 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p35 — Limiti -->
+    <section class="slide" id="p35" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 32 — limiti</span>
+        </div>
+        <h2 class="stagger">tre confini dello studio.</h2>
+        <div class="limits-grid">
+          <div class="limit stagger">
+            <p class="num">01 · geografia</p>
+            <p>solo cibi cinesi e gut metagenomi cinesi. <em>il legame potrebbe variare in altre popolazioni</em> con diete e microbiota diversi.</p>
+          </div>
+          <div class="limit stagger">
+            <p class="num">02 · temporalità</p>
+            <p>il match strain-sharing è una correlazione su campioni statici. <em>manca lo studio longitudinale</em> per provare il flusso causale.</p>
+          </div>
+          <div class="limit stagger">
+            <p class="num">03 · effetto clinico</p>
+            <p>ARG identificati ma <em>non è stata misurata la rilevanza clinica</em>: quanti pazienti reali falliscono terapia per questi geni?</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 35 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p36 — Conclusione 3 take-home -->
+    <section class="slide has-dots" id="p36" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 33 — take-home</span>
+        </div>
+        <h2 class="stagger">cosa <span class="em">ci portiamo a casa</span>.</h2>
+        <div class="takeaways">
+          <div class="takeaway stagger">
+            <span class="marker">01</span>
+            <p class="body">il gene di resistenza <em>esiste</em> negli alimenti fermentati che mangiamo ogni giorno — formaggio, salume, soia.</p>
+          </div>
+          <div class="takeaway stagger">
+            <span class="marker">02</span>
+            <p class="body">il <em>vettore molecolare</em> (Tn916, plasmidi, pompe di efflusso) è pronto a saltare di specie.</p>
+          </div>
+          <div class="takeaway stagger">
+            <span class="marker">03</span>
+            <p class="body">il <em>trasferimento</em> al microbiota intestinale è ora documentato — non più una possibilità, un fatto.</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 36 / 37</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p37 — Grazie wow finale (video bg + glyph cascade) -->
+    <section class="slide" id="p37" data-personality="solid-color-concept">
+      <video class="finale-bg" autoplay muted loop playsinline preload="auto">
+        <source src="assets/hf-01-campo-grano.mp4" type="video/mp4">
+      </video>
+      <div class="finale-bg-shade"></div>
+
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>fine — domande?</span>
+        </div>
+        <div class="thanks-block stagger">
+          <h1 class="glyph-cascade">grazie<br><span class="accent">a voi.</span></h1>
+          <div class="papers-recap">
+            <span>zinno 2023 · formaggi</span>
+            <span>díaz 2025 · salumi</span>
+            <span>xiang 2025 · soia + gut</span>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>raffaele · giorgio · peppe</span></span>
+          <span>p · 37 / 37</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ===== GALLERY OVERLAY ===== -->
+  <div id="gallery">
+    <div class="gallery-header">
+      <h2>tutte le 37 slide</h2>
+      <span class="hint">esc o g per chiudere · click per andare</span>
+    </div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+
+  <div class="gallery-trigger-hint">premi g per la galleria</div>
+
+  <div class="slide-counter"><span id="counter">01 / 14</span></div>
+  <div class="nav-hint">← →  per navigare</div>
+
+  <script>
+    // ──────────────────────────────────────────────────────────────
+    // Auto-fit slide 1920×1080 nel viewport, aspect ratio 16:9.
+    // Tutte le slide vengono scalate insieme.
+    // ──────────────────────────────────────────────────────────────
+    (function () {
+      function fitDeck() {
+        var scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+        document.querySelectorAll('.slide').forEach(function (s) {
+          s.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
+        });
+      }
+      window.addEventListener('resize', fitDeck);
+      window.addEventListener('load', fitDeck);
+      document.addEventListener('DOMContentLoaded', fitDeck);
+      fitDeck();
+    })();
+
+    // ──────────────────────────────────────────────────────────────
+    // Split glyph claims in <span class="glyph" style="--i:N">
+    // Indice progressivo solo su non-space, per stagger fluido.
+    // Regola tipografica: parole orfane (≤2 char) attaccate alla
+    // successiva con NBSP (U+00A0) per evitare "di", "in", "e", "lo"
+    // a fine riga.
+    // ──────────────────────────────────────────────────────────────
+        document.querySelectorAll('.glyph-claim').forEach(function (el) {
+      var NBSP = String.fromCharCode(0xA0);
+
+      // Walk preserving .em class
+      var tokens = [];
+      function walk(node, em) {
+        if (node.nodeType === 3) {
+          var parts = node.textContent.split(/(\s+)/);
+          parts.forEach(function (p) { if (p !== '') tokens.push({text: p, em: em}); });
+        } else if (node.nodeType === 1) {
+          var isEm = em || node.classList.contains('em');
+          node.childNodes.forEach(function (c) { walk(c, isEm); });
+        }
+      }
+      el.childNodes.forEach(function (c) { walk(c, false); });
+
+      // Collapse whitespace tokens
+      var clean = [];
+      tokens.forEach(function (tok) {
+        if (/^\s+$/.test(tok.text)) {
+          if (clean.length === 0) return;
+          if (/^\s+$/.test(clean[clean.length - 1].text)) return;
+          clean.push({text: ' ', em: false});
+        } else {
+          clean.push(tok);
+        }
+      });
+      while (clean.length && /^\s+$/.test(clean[clean.length - 1].text)) clean.pop();
+
+      // Group orphan words (≤2 char) with next
+      var words = clean.filter(function (t) { return !/^\s+$/.test(t.text); });
+      var groups = [];
+      for (var i = 0; i < words.length; i++) {
+        var w = words[i];
+        if (w.text.length <= 2 && i + 1 < words.length) {
+          groups.push([words[i], words[i + 1]]);
+          i++;
+        } else {
+          groups.push([w]);
+        }
+      }
+
+      el.innerHTML = '';
+      var idx = 0;
+      for (var g = 0; g < groups.length; g++) {
+        var group = groups[g];
+        var wordSpan = document.createElement('span');
+        wordSpan.className = 'word';
+        for (var k = 0; k < group.length; k++) {
+          if (k > 0) wordSpan.appendChild(document.createTextNode(NBSP));
+          var sub = group[k];
+          for (var j = 0; j < sub.text.length; j++) {
+            var span = document.createElement('span');
+            span.className = 'glyph' + (sub.em ? ' em' : '');
+            span.style.setProperty('--i', idx);
+            span.textContent = sub.text[j];
+            wordSpan.appendChild(span);
+            idx++;
+          }
+        }
+        el.appendChild(wordSpan);
+        if (g < groups.length - 1) {
+          el.appendChild(document.createTextNode(' '));
+        }
+      }
+    });
+
+    // ──────────────────────────────────────────────────────────────
+    // Navigazione tra slide (← → spazio, n/p)
+    // ──────────────────────────────────────────────────────────────
+    var slides = Array.from(document.querySelectorAll('.slide'));
+    var current = 0;
+    var counterEl = document.getElementById('counter');
+
+    function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function show(i) {
+      i = Math.max(0, Math.min(slides.length - 1, i));
+      slides[current].classList.remove('active', 'entered');
+      slides[i].classList.add('active');
+      current = i;
+      // Trigger stagger dopo un microframe
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          slides[current].classList.add('entered');
+        });
+      });
+      // Reset & play tutti i video della slide attiva
+      slides[current].querySelectorAll('video').forEach(function (vid) {
+        try {
+          // Force load if not ready
+          if (vid.readyState < 2) { vid.load(); }
+          vid.currentTime = 0;
+          vid.playbackRate = 1.0;
+          var p = vid.play();
+          if (p && p.catch) p.catch(function (err) {
+            console.warn('autoplay blocked, will retry on user interaction', err);
+          });
+        } catch (e) { console.warn('video error', e); }
+      });
+      // Counter
+      if (counterEl) counterEl.textContent = pad2(current + 1) + ' / ' + pad2(slides.length);
+    }
+
+    window.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'n') {
+        show(current + 1); e.preventDefault();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'p') {
+        show(current - 1); e.preventDefault();
+      } else if (e.key === 'Home') {
+        show(0); e.preventDefault();
+      } else if (e.key === 'End') {
+        show(slides.length - 1); e.preventDefault();
+      }
+    });
+
+    // Boot: prima slide attiva
+    show(0);
+
+    // ──────────────────────────────────────────────────────────────
+    // SVG draw-in (MOV-5): calcola lunghezza di ogni elemento stroked
+    // e setta --len come CSS var per stroke-dasharray animation.
+    // ──────────────────────────────────────────────────────────────
+    document.querySelectorAll('.draw-in [data-len]').forEach(function (el) {
+      try {
+        var len = el.getTotalLength();
+        el.style.setProperty('--len', len);
+      } catch (e) {
+        el.style.setProperty('--len', 2000);
+      }
+    });
+
+    // ──────────────────────────────────────────────────────────────
+    // Cinematic slowdown — ultimi 1.5s del video rallentano a 0.25×
+    // ──────────────────────────────────────────────────────────────
+    document.querySelectorAll('video.hero-media').forEach(function (video) {
+      var FADE_WINDOW = 1.5;
+      var MIN_RATE = 0.25;
+      video.addEventListener('timeupdate', function () {
+        if (!isFinite(video.duration)) return;
+        var remaining = video.duration - video.currentTime;
+        if (remaining < FADE_WINDOW) {
+          var t = remaining / FADE_WINDOW;
+          video.playbackRate = MIN_RATE + (1 - MIN_RATE) * t;
+        }
+      });
+    });
+
+    // ──────────────────────────────────────────────────────────────
+    // Count-up animation: numero da 0 a target con easing Farm Minerals.
+    // Triggered ogni volta che una slide diventa 'entered'.
+    // ──────────────────────────────────────────────────────────────
+    function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
+
+    function animateCountUp(el) {
+      var target = parseInt(el.getAttribute('data-target'), 10);
+      var duration = parseInt(el.getAttribute('data-duration'), 10) || 1400;
+      var start = performance.now();
+      function tick(now) {
+        var t = Math.min(1, (now - start) / duration);
+        var v = Math.round(easeOutQuint(t) * target);
+        el.textContent = v;
+        if (t < 1) requestAnimationFrame(tick);
+      }
+      el.textContent = '0';
+      requestAnimationFrame(tick);
+    }
+
+    var lastCountUpSlide = null;
+    function triggerCountUps() {
+      var active = document.querySelector('.slide.entered');
+      if (!active || active === lastCountUpSlide) return;
+      lastCountUpSlide = active;
+      var els = active.querySelectorAll('.count-up');
+      var baseDelay = 600; // after stagger entrance
+      els.forEach(function (el, i) {
+        setTimeout(function () { animateCountUp(el); }, baseDelay + i * 120);
+      });
+    }
+    // Observe slide class changes
+    var entryObs = new MutationObserver(triggerCountUps);
+    document.querySelectorAll('.slide').forEach(function (s) {
+      entryObs.observe(s, {attributes: true, attributeFilter: ['class']});
+    });
+    // Initial check after a tick
+    setTimeout(triggerCountUps, 800);
+
+    // ──────────────────────────────────────────────────────────────
+    // Autoplay fallback: alcuni browser bloccano autoplay anche con muted
+    // Su qualsiasi user interaction, tenta play su tutti i video
+    // ──────────────────────────────────────────────────────────────
+    function tryPlayAll() {
+      document.querySelectorAll('video').forEach(function (vid) {
+        if (vid.paused) {
+          var p = vid.play();
+          if (p && p.catch) p.catch(function () {});
+        }
+      });
+    }
+    document.addEventListener('click', tryPlayAll, {once: false});
+    document.addEventListener('keydown', tryPlayAll, {once: false});
+    document.addEventListener('touchstart', tryPlayAll, {once: false});
+  
+
+    // ──────────────────────────────────────────────────────────────
+    // Glyph cascade per p37 finale: split testo h1 in span con stagger
+    // ──────────────────────────────────────────────────────────────
+    (function () {
+      var h1 = document.querySelector('#p37 h1.glyph-cascade');
+      if (!h1) return;
+      // Walk and split each text node into characters, keeping inline structure
+      function processNode(node) {
+        if (node.nodeType === 3) {
+          var frag = document.createDocumentFragment();
+          var chars = node.textContent.split('');
+          chars.forEach(function (ch, i) {
+            if (ch === '\n' || ch === ' ') {
+              frag.appendChild(document.createTextNode(ch));
+            } else {
+              var span = document.createElement('span');
+              span.className = 'ch';
+              span.textContent = ch;
+              frag.appendChild(span);
+            }
+          });
+          node.parentNode.replaceChild(frag, node);
+        } else if (node.nodeType === 1 && node.tagName !== 'BR') {
+          Array.from(node.childNodes).forEach(processNode);
+        }
+      }
+      Array.from(h1.childNodes).forEach(processNode);
+      // Apply stagger delay
+      var chars = h1.querySelectorAll('.ch');
+      chars.forEach(function (ch, i) {
+        ch.style.transitionDelay = (0.4 + i * 0.07) + 's';
+      });
+    })();
+
+    // ──────────────────────────────────────────────────────────────
+    // GALLERY — popola griglia all'init, tasto G per toggle
+    // ──────────────────────────────────────────────────────────────
+    (function () {
+      var galleryEl = document.getElementById('gallery');
+      var gridEl = document.getElementById('galleryGrid');
+      if (!galleryEl || !gridEl) return;
+
+      // Costruisci la griglia clonando dati essenziali da ogni slide
+      slides.forEach(function (slide, idx) {
+        var item = document.createElement('div');
+        item.className = 'gallery-item';
+        var media = slide.querySelector('img.hero-media, video.hero-media, video.schema-video, video.mech-video, video.pipeline-video, .paper-col img, .hero-media');
+        var n = (idx + 1).toString().padStart(2, '0');
+        var sid = slide.id;
+
+        // Determina contesto colore
+        var bg = window.getComputedStyle(slide).backgroundColor;
+        var isDark = bg && bg.indexOf('64, 79, 29') !== -1; // main-green
+        if (isDark) item.classList.add('bg-dark');
+
+        if (media) {
+          if (media.tagName === 'VIDEO') {
+            var poster = media.getAttribute('poster');
+            if (poster) {
+              var img = document.createElement('img');
+              img.src = poster;
+              img.loading = 'lazy';
+              item.appendChild(img);
+            } else {
+              // Clone video without autoplay
+              var v = document.createElement('video');
+              var src = media.querySelector('source');
+              if (src) {
+                v.src = src.src;
+                v.muted = true;
+                v.playsInline = true;
+              }
+              item.appendChild(v);
+            }
+          } else {
+            var img = document.createElement('img');
+            img.src = media.src;
+            img.loading = 'lazy';
+            item.appendChild(img);
+          }
+        } else {
+          // Text-only preview: extract main heading
+          item.classList.add('text-only');
+          var textWrap = document.createElement('div');
+          textWrap.className = 'preview-text';
+          var h = slide.querySelector('h1, h2, .glyph-claim');
+          textWrap.textContent = (h ? h.textContent.trim().slice(0, 80) : sid).toLowerCase();
+          item.appendChild(textWrap);
+        }
+
+        var meta = document.createElement('div');
+        meta.className = 'item-meta';
+        meta.innerHTML = '<span class="num">' + n + '</span> &nbsp; ' + sid;
+        item.appendChild(meta);
+
+        item.addEventListener('click', function () {
+          galleryEl.classList.remove('open');
+          show(idx);
+        });
+
+        gridEl.appendChild(item);
+      });
+
+      // Keyboard binding
+      window.addEventListener('keydown', function (e) {
+        if (e.key === 'g' || e.key === 'G') {
+          galleryEl.classList.toggle('open');
+          e.preventDefault();
+        } else if (e.key === 'Escape' && galleryEl.classList.contains('open')) {
+          galleryEl.classList.remove('open');
+          e.preventDefault();
+        }
+      });
+    })();
+
+  </script>
+</body>
+</html>

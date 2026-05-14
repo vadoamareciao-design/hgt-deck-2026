@@ -1,0 +1,6 @@
+.DS_Store
+*.bak
+.bak-*
+manim/
+manim2/
+manim3/
