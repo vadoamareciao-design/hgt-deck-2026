@@ -182,6 +182,10 @@
       display: inline-block;
     }
 
+    /* Utility: preserva la capitalizzazione dei nomi propri (acronimi, generi/specie, autori)
+       quando l'elemento genitore ha text-transform: lowercase (feedback esperto 2026-05-17) */
+    .proper { text-transform: none !important; font-style: inherit; }
+
     /* Stagger entrance (MOV-4) */
     .stagger {
       opacity: 0;
@@ -727,6 +731,8 @@
       background: rgba(122, 131, 95, 0.10);
       border-radius: 8px;
       padding: 16px;
+      /* shift verso il basso per liberare l'etichetta scura in alto (feedback esperto 2026-05-17) */
+      transform: translateY(48px);
     }
     #r09 .r09-citation {
       font-size: 14px;
@@ -813,36 +819,43 @@
     #r11 .points {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      column-gap: 80px;
-      align-items: start;
+      column-gap: 48px;
+      align-items: stretch;
       padding-top: 24px;
+    }
+    /* Frame separati per le 3 evidenze (richiesta esperto 2026-05-17) */
+    #r11 .point {
+      background: var(--olive-soft);
+      border-radius: 6px;
+      padding: 36px 36px 40px;
+      border-top: 3px solid var(--green-light);
     }
     #r11 .point .point-num {
       font-family: var(--font-sans);
-      font-weight: 400;
-      font-size: 18px;
-      letter-spacing: 0.18em;
+      font-weight: 500;
+      font-size: 28px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--green-light);
-      margin: 0 0 16px;
+      margin: 0 0 20px;
     }
     #r11 .point .point-title {
       font-family: var(--font-sans);
       font-weight: 500;
-      font-size: 40px;
+      font-size: 38px;
       line-height: 1.0;
       letter-spacing: -0.02em;
       text-transform: lowercase;
       color: var(--main-green);
-      margin: 0 0 20px;
-      max-width: 360px;
+      margin: 0 0 22px;
+      max-width: 340px;
     }
     #r11 .point .point-body {
-      font-size: 20px;
+      font-size: 24px;
       font-weight: 400;
       line-height: 1.45;
       color: var(--green-deep);
-      max-width: 380px;
+      max-width: 320px;
       margin: 0;
     }
     #r11 .footer-row { color: var(--main-green); }
@@ -883,22 +896,28 @@
     #r12 .limits-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      column-gap: 40px;
-      align-items: start;
-      padding-top: 32px;
-      border-top: 1px solid rgba(244, 237, 230, 0.20);
+      column-gap: 28px;
+      align-items: stretch;
+      padding-top: 24px;
+    }
+    /* Frame separati replicati dal pattern g23/p35 (regola di simmetria 2026-05-17) */
+    #r12 .limits-grid .limit {
+      background: rgba(244, 237, 230, 0.08);
+      border-top: 3px solid var(--green-light);
+      border-radius: 6px;
+      padding: 28px 26px 32px;
     }
     #r12 .limits-grid .limit .num {
       font-family: var(--font-sans);
-      font-weight: 400;
-      font-size: 18px;
-      letter-spacing: 0.18em;
+      font-weight: 500;
+      font-size: 22px;
+      letter-spacing: 0.12em;
       color: var(--green-light);
       text-transform: uppercase;
-      margin: 0 0 12px;
+      margin: 0 0 16px;
     }
     #r12 .limits-grid .limit p {
-      font-size: 18px;
+      font-size: 21px;
       line-height: 1.4;
       color: var(--beige);
       opacity: 0.85;
@@ -1400,18 +1419,25 @@
     }
     #g23 .limits-grid {
       display: grid; grid-template-columns: repeat(3, 1fr);
-      column-gap: 40px; align-items: start;
+      column-gap: 36px; align-items: stretch;
       padding-top: 24px;
-      border-top: 1px solid rgba(244, 237, 230, 0.20);
+    }
+    /* Frame separati + testo ingrandito (feedback esperto 2026-05-17) */
+    #g23 .limit {
+      background: rgba(244, 237, 230, 0.08);
+      border-top: 3px solid var(--green-light);
+      border-radius: 6px;
+      padding: 32px 32px 36px;
     }
     #g23 .limit .num {
-      font-size: 16px; letter-spacing: 0.18em;
+      font-size: 26px; letter-spacing: 0.12em; font-weight: 500;
       text-transform: uppercase; color: var(--green-light);
-      margin: 0 0 14px;
+      margin: 0 0 18px;
     }
     #g23 .limit p {
-      font-size: 18px; line-height: 1.45; color: var(--beige);
-      opacity: 0.85; margin: 0;
+      font-size: 26px; line-height: 1.4; color: var(--beige);
+      opacity: 0.92; margin: 0;
+      max-width: 360px;
     }
     #g23 .limit p em { color: var(--green-light); font-style: italic; font-weight: 500; opacity: 1; }
     #g23 .footer-row { color: var(--beige); }
@@ -1497,6 +1523,95 @@
     #p26 .footer-row { grid-column: 1 / 3; color: var(--main-green); }
     #p26 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
 
+    /* p27a — Identificazione specie (3-card grid + warning band + antagonism claim) */
+    #p27a { background: var(--beige); color: var(--main-green); }
+    #p27a .overlay {
+      position: relative; height: 100%; padding: 88px 96px;
+      display: grid; grid-template-rows: auto auto auto auto auto auto; row-gap: 28px;
+    }
+    #p27a h2 {
+      font-weight: 500; font-size: 60px; line-height: 0.98;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--heading-color); margin: 0; max-width: 1500px;
+    }
+    #p27a h2 .em { color: var(--green-light); font-style: italic; }
+    #p27a .species-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      column-gap: 32px; padding-top: 4px;
+    }
+    #p27a .species-card {
+      background: var(--olive-soft); border-radius: 8px;
+      padding: 30px 28px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    #p27a .species-card .num {
+      font-size: 14px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light); margin: 0;
+    }
+    #p27a .species-card .species {
+      font-family: var(--font-sans);
+      font-weight: 500; font-size: 34px; line-height: 1.0;
+      letter-spacing: -0.02em;
+      color: var(--main-green); margin: 0;
+    }
+    #p27a .species-card .species em { font-style: italic; }
+    #p27a .species-card .role {
+      font-size: 16px; line-height: 1.4;
+      color: var(--green-deep); margin: 0;
+    }
+    #p27a .warning-band {
+      display: grid; grid-template-columns: 200px 1fr;
+      column-gap: 32px; align-items: baseline;
+      padding: 22px 0;
+      border-top: 1px solid rgba(64, 79, 29, 0.20);
+      border-bottom: 1px solid rgba(64, 79, 29, 0.20);
+    }
+    #p27a .warning-band .warn-tag {
+      font-size: 14px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light); margin: 0;
+    }
+    #p27a .warning-band .warn-body {
+      font-size: 20px; line-height: 1.4;
+      color: var(--green-deep); margin: 0;
+    }
+    #p27a .warning-band .warn-body strong { color: var(--main-green); font-weight: 500; }
+    #p27a .warning-band .warn-body em { color: var(--green-light); font-style: italic; font-weight: 500; }
+    #p27a .antagonism-claim {
+      display: flex; align-items: baseline; justify-content: center;
+      column-gap: 22px;
+      font-family: var(--font-sans);
+      font-size: 38px;
+      letter-spacing: -0.01em;
+      color: var(--main-green);
+      text-transform: lowercase;
+      padding-top: 6px;
+    }
+    #p27a .antagonism-claim .word {
+      font-style: italic;
+      color: var(--green-deep);
+    }
+    #p27a .antagonism-claim .vs {
+      color: var(--green-light);
+      font-size: 22px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    #p27a .antagonism-claim .lab {
+      font-weight: 500;
+      color: var(--green-light);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 38px;
+    }
+    #p27a .antagonism-claim .ent {
+      font-weight: 500;
+      color: var(--main-green);
+      font-style: italic;
+    }
+    #p27a .footer-row { color: var(--main-green); }
+    #p27a .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
     /* p27 — La domanda (claim glyph) */
     #p27 { background: var(--main-green); color: var(--beige); }
     #p27 .hero-media { opacity: 0.35; filter: saturate(0.7); }
@@ -1523,9 +1638,11 @@
       font-weight: 500; font-size: 88px; line-height: 0.95;
       letter-spacing: -0.02em; text-transform: lowercase;
       color: var(--heading-color); margin: 0; max-width: 1500px;
+      /* respiro extra dopo l'h2 — feedback esperto 2026-05-17 (2-3 righe vuote prima del body) */
+      margin-bottom: 96px;
     }
     #p28 .obj-body {
-      font-size: 26px; line-height: 1.45; color: var(--green-deep);
+      font-size: 28px; line-height: 1.5; color: var(--green-deep);
       max-width: 1200px; margin: 0;
     }
     #p28 .obj-body strong { font-weight: 500; color: var(--main-green); }
@@ -1717,6 +1834,128 @@
     #p32 .footer-row { color: var(--main-green); }
     #p32 .footer-row::before { background: rgba(64, 79, 29, 0.20); }
 
+    /* p32a — Annotazione funzionale (2.4M geni + 3 database + ARG breakdown) */
+    #p32a { background: var(--beige); color: var(--main-green); }
+    #p32a .overlay {
+      position: relative; height: 100%; padding: 80px 96px;
+      display: grid; grid-template-rows: auto auto auto auto auto auto; row-gap: 28px;
+    }
+    #p32a h2 {
+      font-weight: 500; font-size: 56px; line-height: 0.98;
+      letter-spacing: -0.02em; text-transform: lowercase;
+      color: var(--heading-color); margin: 0; max-width: 1500px;
+    }
+    #p32a h2 .em { color: var(--green-light); font-style: italic; }
+
+    #p32a .gene-hero {
+      display: grid; grid-template-columns: auto 1fr;
+      column-gap: 36px; align-items: baseline;
+      padding: 16px 0;
+      border-top: 1px solid rgba(64, 79, 29, 0.18);
+      border-bottom: 1px solid rgba(64, 79, 29, 0.18);
+    }
+    #p32a .gene-hero .big-num {
+      font-family: var(--font-sans);
+      font-weight: 500; font-size: 96px;
+      line-height: 0.95; letter-spacing: -0.03em;
+      color: var(--main-green); margin: 0;
+      font-variant-numeric: tabular-nums;
+    }
+    #p32a .gene-hero .big-cap {
+      font-size: 20px; line-height: 1.4;
+      color: var(--green-deep); margin: 0; max-width: 520px;
+    }
+
+    #p32a .db-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      column-gap: 24px;
+    }
+    #p32a .db-chip {
+      background: var(--olive-soft); border-radius: 8px;
+      padding: 20px 24px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    #p32a .db-chip .db-name {
+      font-family: var(--font-sans);
+      font-weight: 500; font-size: 30px;
+      letter-spacing: -0.01em; color: var(--main-green); margin: 0;
+    }
+    #p32a .db-chip .db-desc {
+      font-size: 14px; line-height: 1.35;
+      color: var(--green-deep); margin: 0;
+      letter-spacing: 0.01em;
+    }
+
+    #p32a .annot-row {
+      display: grid; grid-template-columns: 320px 1fr;
+      column-gap: 48px; align-items: center;
+    }
+    #p32a .annot-pct .pct-num {
+      font-family: var(--font-sans);
+      font-weight: 500; font-size: 88px;
+      line-height: 0.95; letter-spacing: -0.02em;
+      color: var(--green-light); margin: 0;
+    }
+    #p32a .annot-pct .pct-num .pct-small {
+      font-size: 40px; color: var(--green-light); vertical-align: top;
+    }
+    #p32a .annot-pct .pct-cap {
+      font-size: 15px; line-height: 1.35;
+      color: var(--green-deep); margin: 6px 0 0;
+      max-width: 260px;
+    }
+    #p32a .annot-breakdown { display: flex; flex-direction: column; gap: 10px; }
+    #p32a .annot-breakdown .brk-tag {
+      font-size: 13px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--green-light); margin: 0;
+    }
+    #p32a .brk-bar {
+      display: flex; width: 100%; height: 36px;
+      border-radius: 6px; overflow: hidden;
+      background: rgba(64, 79, 29, 0.10);
+    }
+    #p32a .brk-seg {
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-sans);
+      font-size: 13px; font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--beige);
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    #p32a .brk-seg.dj { background: var(--green-deep); }
+    #p32a .brk-seg.dc { background: var(--main-green); }
+    #p32a .brk-seg.fr { background: var(--green-light); color: var(--main-green); }
+    #p32a .annot-breakdown .brk-note {
+      font-size: 16px; line-height: 1.4;
+      color: var(--green-deep); margin: 0;
+    }
+    #p32a .annot-breakdown .brk-note strong { color: var(--main-green); font-weight: 500; }
+    #p32a .annot-breakdown .brk-note em { color: var(--green-light); font-style: italic; font-weight: 500; }
+
+    #p32a .arg-band {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      column-gap: 32px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(64, 79, 29, 0.18);
+    }
+    #p32a .arg-stat .arg-num {
+      font-family: var(--font-sans);
+      font-weight: 500; font-size: 64px;
+      line-height: 0.95; letter-spacing: -0.02em;
+      color: var(--main-green); margin: 0;
+      font-variant-numeric: tabular-nums;
+    }
+    #p32a .arg-stat .arg-cap {
+      font-size: 15px; line-height: 1.35;
+      color: var(--green-deep); margin: 8px 0 0;
+      max-width: 320px;
+    }
+    #p32a .arg-stat.highlight .arg-num { color: var(--green-light); }
+    #p32a .arg-stat.highlight .arg-cap em { color: var(--green-light); font-style: italic; }
+    #p32a .footer-row { color: var(--main-green); }
+    #p32a .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
     /* p33 — Pistola fumante (claim glyph dramatico) */
     #p33 { background: var(--main-green); color: var(--beige); }
     #p33 .overlay {
@@ -1744,21 +1983,28 @@
     }
     #p34 .points {
       display: grid; grid-template-columns: repeat(3, 1fr);
-      column-gap: 80px; align-items: start; padding-top: 24px;
+      column-gap: 48px; align-items: stretch; padding-top: 24px;
+    }
+    /* Frame separati + testo ingrandito (feedback esperto 2026-05-17) */
+    #p34 .point {
+      background: var(--olive-soft);
+      border-radius: 6px;
+      padding: 36px 36px 40px;
+      border-top: 3px solid var(--green-light);
     }
     #p34 .point .point-num {
-      font-size: 18px; letter-spacing: 0.18em;
+      font-size: 28px; letter-spacing: 0.12em; font-weight: 500;
       text-transform: uppercase; color: var(--green-light);
-      margin: 0 0 16px;
+      margin: 0 0 20px;
     }
     #p34 .point .point-title {
-      font-weight: 500; font-size: 38px; line-height: 1.0;
+      font-weight: 500; font-size: 36px; line-height: 1.0;
       letter-spacing: -0.02em; text-transform: lowercase;
-      color: var(--main-green); margin: 0 0 20px; max-width: 360px;
+      color: var(--main-green); margin: 0 0 22px; max-width: 340px;
     }
     #p34 .point .point-body {
-      font-size: 19px; line-height: 1.45;
-      color: var(--green-deep); max-width: 380px; margin: 0;
+      font-size: 24px; line-height: 1.45;
+      color: var(--green-deep); max-width: 320px; margin: 0;
     }
     #p34 .point .point-body strong { font-weight: 500; color: var(--main-green); }
     #p34 .point .point-body em { font-style: italic; color: var(--green-light); font-weight: 500; }
@@ -1780,16 +2026,22 @@
     }
     #p35 .limits-grid {
       display: grid; grid-template-columns: repeat(3, 1fr);
-      column-gap: 40px; align-items: start; padding-top: 24px;
-      border-top: 1px solid rgba(244, 237, 230, 0.20);
+      column-gap: 36px; align-items: stretch; padding-top: 24px;
+    }
+    /* Frame separati + testo ingrandito (feedback esperto 2026-05-17) */
+    #p35 .limit {
+      background: rgba(244, 237, 230, 0.08);
+      border-top: 3px solid var(--green-light);
+      border-radius: 6px;
+      padding: 32px 32px 36px;
     }
     #p35 .limit .num {
-      font-size: 16px; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--green-light); margin: 0 0 14px;
+      font-size: 26px; letter-spacing: 0.12em; font-weight: 500;
+      text-transform: uppercase; color: var(--green-light); margin: 0 0 18px;
     }
     #p35 .limit p {
-      font-size: 18px; line-height: 1.45; color: var(--beige);
-      opacity: 0.85; margin: 0;
+      font-size: 26px; line-height: 1.4; color: var(--beige);
+      opacity: 0.92; margin: 0; max-width: 360px;
     }
     #p35 .limit p em { color: var(--green-light); font-style: italic; font-weight: 500; opacity: 1; }
     #p35 .footer-row { color: var(--beige); }
@@ -2086,7 +2338,7 @@
     }
 
     /* ──────────────────────────────────────────────────────────────
-       GALLERY VIEW — tasto G per panoramica di tutte le 37 slide
+       GALLERY VIEW — tasto G per panoramica di tutte le 39 slide
        ────────────────────────────────────────────────────────────── */
     #gallery {
       position: fixed;
@@ -2487,7 +2739,7 @@
 
         <div class="text-col stagger">
           <p class="citation">zinno et al. · 2023 · food microbiology</p>
-          <h2>cercavano il gene tet(m) nei lab dei formaggi italiani.</h2>
+          <h2>cercavano il gene <span class="proper">tet(M)</span> nei <span class="proper">LAB</span> dei formaggi italiani.</h2>
           <p class="body-text">Obiettivo: misurare la presenza di geni di resistenza a tetracicline negli starter caseari, lievito naturale del nostro patrimonio fermentativo, e tracciarne il rischio di trasferimento orizzontale.</p>
         </div>
 
@@ -2528,7 +2780,7 @@
           <div class="step stagger">
             <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 10c8 6 16 6 24 0M16 46c8-6 16-6 24 0M18 14l20 28M38 14L18 42"/></svg></div>
             <p class="num">03 · pcr</p>
-            <p class="title">screening tet(m)</p>
+            <p class="title">screening <span class="proper">tet(M)</span></p>
             <p class="body">Amplificazione gene tet(M) (~700 bp) + sequencing per identificare varianti e contesto trasposonico.</p>
           </div>
           <div class="step stagger">
@@ -2557,7 +2809,7 @@
         <div class="stat-hero stagger">
           <p class="stat-number"><span class="count-up" data-target="56" data-duration="1800">0</span><span class="pct">%</span></p>
           <div class="stat-caption">
-            <h2>dei campioni caseari portano tet(m).</h2>
+            <h2>dei campioni caseari portano <span class="proper">tet(M)</span>.</h2>
             <p>Più della metà degli starter analizzati ospita il gene di resistenza alle tetracicline — pronto a circolare.</p>
           </div>
         </div>
@@ -2569,7 +2821,7 @@
           </div>
           <div class="cell">
             <p class="num"><span class="count-up" data-target="67" data-duration="1400">0</span></p>
-            <p class="lbl">positivi tet(m)</p>
+            <p class="lbl">positivi <span class="proper">tet(M)</span></p>
           </div>
           <div class="cell">
             <p class="num"><span class="count-up" data-target="9" data-duration="1200">0</span></p>
@@ -2598,7 +2850,7 @@
 
         <div class="text-col stagger">
           <p class="r09-citation">tn916 · 18 kb · trasposone coniugativo</p>
-          <h2>tet(m) non sta fermo: viaggia.</h2>
+          <h2><span class="proper">tet(M)</span> non sta fermo: viaggia.</h2>
           <p class="caption"><strong>Tn916</strong> si stacca dal cromosoma del donatore grazie all'integrasi <em>int</em>, viene trasferito per coniugazione, e si reintegra in un nuovo ospite. È <em>autosufficiente</em>: porta con sé tutto il macchinario molecolare (<em>int</em>, <em>xis</em>, <em>tra</em>, <em>ori-T</em>) per saltare di specie in specie.</p>
         </div>
 
@@ -2652,7 +2904,7 @@
           <div class="point stagger">
             <p class="point-num">01 · diffusione</p>
             <p class="point-title">il gene è dove non guardavamo.</p>
-            <p class="point-body"><strong>67/120 campioni positivi a tet(m)</strong> — il 56% degli starter caseari italiani analizzati. Nove specie LAB coinvolte (L. plantarum, L. paracasei, S. thermophilus, E. faecium tra le principali). Non un'eccezione, ma <em>una costante</em> nel patrimonio fermentativo nazionale.</p>
+            <p class="point-body"><strong>67/120 campioni positivi a tet(M)</strong> — il 56% degli starter caseari italiani analizzati. Nove specie LAB coinvolte (L. plantarum, L. paracasei, S. thermophilus, E. faecium tra le principali). Non un'eccezione, ma <em>una costante</em> nel patrimonio fermentativo nazionale.</p>
           </div>
           <div class="point stagger">
             <p class="point-num">02 · mobilità</p>
@@ -2764,7 +3016,7 @@
 
         <div class="handoff-block stagger">
           <p class="recap">finora: <span class="emph">il gene c'è, il vettore è pronto, lo scambio è documentato.</span></p>
-          <h1>passo la parola<br><span class="accent">a Giorgio.</span></h1>
+          <h1>passo la parola<br><span class="accent">a <span class="proper">Giorgio</span>.</span></h1>
           <p class="next-speaker">→ salumi spagnoli, ARG in matrice carnea stagionata · diaz 2025</p>
         </div>
 
@@ -2791,7 +3043,7 @@
         </div>
         <div class="claim-block stagger">
           <p class="speaker-tag">díaz 2025 · meat science</p>
-          <h1>i salumi spagnoli<br>portano <span class="accent">ARG</span>.</h1>
+          <h1>i salumi spagnoli<br>portano <span class="accent proper">ARG</span>.</h1>
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>giorgio</span></span>
@@ -2832,7 +3084,7 @@
         <div class="stat-hero stagger">
           <p class="stat-number"><span class="count-up" data-target="68" data-duration="1800">0</span><span class="pct">%</span></p>
           <div class="stat-caption">
-            <h2>dei lab nei salumi è multiresistente.</h2>
+            <h2>dei <span class="proper">LAB</span> nei salumi è multiresistente.</h2>
             <p>Oltre due terzi degli isolati mostra resistenza a 3 o più antibiotici diversi — un reservoir silenzioso nel cibo quotidiano.</p>
           </div>
         </div>
@@ -3035,7 +3287,7 @@
         </div>
         <div class="handoff-block stagger">
           <p class="recap">finora: <span class="emph">il gene c'è (zinno), i salumi sono mdr (díaz).</span> ma quanto arriva davvero nel microbioma intestinale?</p>
-          <h1>passo la parola<br><span class="accent">a Peppe.</span></h1>
+          <h1>passo la parola<br><span class="accent">a <span class="proper">Peppe</span>.</span></h1>
           <p class="next-speaker">→ metagenomica del microbioma e ARG · xiang 2025</p>
         </div>
         <div class="footer-row stagger">
@@ -3065,7 +3317,7 @@
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 25 / 37</span>
+          <span>p · 25 / 39</span>
         </div>
       </div>
     </section>
@@ -3087,7 +3339,50 @@
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 26 / 37</span>
+          <span>p · 26 / 39</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p27a — Identificazione specie batteriche (starter + Enterobacteriaceae) -->
+    <section class="slide has-dots" id="p27a" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 23b — identificazione specie</span>
+        </div>
+        <h2 class="stagger">le specie più presenti? <span class="em">gli starter di fermentazione.</span></h2>
+        <div class="species-grid">
+          <div class="species-card stagger">
+            <p class="num">DC · douchi</p>
+            <p class="species"><em>Bacillus<br>subtilis</em></p>
+            <p class="role">starter dominante dei fagioli neri fermentati.</p>
+          </div>
+          <div class="species-card stagger">
+            <p class="num">DJ · dou jiang</p>
+            <p class="species"><em>Aspergillus<br>oryzae</em></p>
+            <p class="role">muffa fermentativa (koji) della pasta di soia.</p>
+          </div>
+          <div class="species-card stagger">
+            <p class="num">FR · fu ru</p>
+            <p class="species"><em>Tetragenococcus<br>halophilus</em></p>
+            <p class="role">LAB alofilo del tofu fermentato salato.</p>
+          </div>
+        </div>
+        <div class="warning-band stagger">
+          <p class="warn-tag">ma anche —</p>
+          <p class="warn-body">notevole presenza di patogeni opportunistici del phylum <strong>Proteobacteria</strong> e famiglia <strong>Enterobacteriaceae</strong> in tutti e 3 i gruppi, incluse varie specie del genere <em>Klebsiella</em>.</p>
+        </div>
+        <div class="antagonism-claim stagger">
+          <span class="word">antagonismo</span>
+          <span class="vs">·</span>
+          <span class="lab">LAB</span>
+          <span class="vs">vs</span>
+          <span class="ent">Enterobacterales</span>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 27 / 39</span>
         </div>
       </div>
     </section>
@@ -3106,7 +3401,7 @@
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 27 / 37</span>
+          <span>p · 28 / 39</span>
         </div>
       </div>
     </section>
@@ -3122,7 +3417,7 @@
         <p class="obj-body stagger">Tracciare i ceppi batterici e i geni di resistenza <strong>dal cibo fermentato cinese al microbiota intestinale umano</strong>, usando la <em>metagenomica shotgun</em> — sequenziamento dell'intero DNA microbico, non solo del 16S rRNA. Per la prima volta a livello di ceppo e gene.</p>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 28 / 37</span>
+          <span>p · 29 / 39</span>
         </div>
       </div>
     </section>
@@ -3163,7 +3458,7 @@
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 29 / 37</span>
+          <span>p · 30 / 39</span>
         </div>
       </div>
     </section>
@@ -3186,7 +3481,7 @@
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 30 / 37</span>
+          <span>p · 31 / 39</span>
         </div>
       </div>
     </section>
@@ -3202,12 +3497,79 @@
         </div>
         <div class="name-block stagger">
           <p class="name-eyebrow">patogeno · multiresistente · trovato</p>
-          <h1>klebsiella<br><span class="accent">pneumoniae</span>.</h1>
+          <h1><span class="proper">Klebsiella</span><br><span class="accent proper">pneumoniae</span>.</h1>
           <p class="name-tag">Identificata in <strong>più campioni di cibo fermentato</strong> — patogeno nosocomiale classico, responsabile di polmoniti, sepsi e infezioni urinarie ospedaliere. Anche la cugina <em>K. quasipneumoniae</em> è stata trovata.</p>
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 31 / 37</span>
+          <span>p · 32 / 39</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- p32a — Annotazione funzionale: 2.4M geni + 3 database + ARG breakdown -->
+    <section class="slide has-dots" id="p32a" data-personality="schema-scientifico-fullbleed">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 28b — annotazione funzionale</span>
+        </div>
+        <h2 class="stagger">2.359.387 geni, <span class="em">tre database</span>, una mappa di resistenze.</h2>
+
+        <div class="gene-hero stagger">
+          <p class="big-num">2.359.387</p>
+          <p class="big-cap">geni totali analizzati nel metagenoma dei tre prodotti fermentati di soia.</p>
+        </div>
+
+        <div class="db-row stagger">
+          <div class="db-chip">
+            <p class="db-name">KEGG</p>
+            <p class="db-desc">Kyoto Encyclopedia of Genes and Genomes — vie metaboliche.</p>
+          </div>
+          <div class="db-chip">
+            <p class="db-name">CARD</p>
+            <p class="db-desc">Comprehensive Antibiotic Resistance Database — geni di resistenza.</p>
+          </div>
+          <div class="db-chip">
+            <p class="db-name">CAZy</p>
+            <p class="db-desc">Carbohydrate Active Enzymes — enzimi che lavorano gli zuccheri.</p>
+          </div>
+        </div>
+
+        <div class="annot-row stagger">
+          <div class="annot-pct">
+            <p class="pct-num">84,4<span class="pct-small">%</span></p>
+            <p class="pct-cap">dei geni annotati con almeno un database.</p>
+          </div>
+          <div class="annot-breakdown">
+            <p class="brk-tag">distribuzione dei geni annotati</p>
+            <div class="brk-bar">
+              <div class="brk-seg dj" style="width: 8.54%;"><span>DJ · 8,54%</span></div>
+              <div class="brk-seg dc" style="width: 38.1%;"><span>DC · 38,1%</span></div>
+              <div class="brk-seg fr" style="width: 53.4%;"><span>FR · 53,4%</span></div>
+            </div>
+            <p class="brk-note">FR contribuisce al <strong>76,2%</strong> delle specie totali rilevate — <em>la più ricca diversità microbica osservata</em>.</p>
+          </div>
+        </div>
+
+        <div class="arg-band stagger">
+          <div class="arg-stat">
+            <p class="arg-num">2.406</p>
+            <p class="arg-cap">geni distinti di resistenza agli antibiotici identificati.</p>
+          </div>
+          <div class="arg-stat">
+            <p class="arg-num">734</p>
+            <p class="arg-cap">termini ARO (Antibiotic Resistance Ontology) associati.</p>
+          </div>
+          <div class="arg-stat highlight">
+            <p class="arg-num">373</p>
+            <p class="arg-cap"><em>condivisi tra tutti e tre i prodotti</em> fermentati.</p>
+          </div>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 33 / 39</span>
         </div>
       </div>
     </section>
@@ -3245,7 +3607,7 @@
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 32 / 37</span>
+          <span>p · 34 / 39</span>
         </div>
       </div>
     </section>
@@ -3262,7 +3624,7 @@
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 33 / 37</span>
+          <span>p · 35 / 39</span>
         </div>
       </div>
     </section>
@@ -3294,7 +3656,7 @@
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 34 / 37</span>
+          <span>p · 36 / 39</span>
         </div>
       </div>
     </section>
@@ -3323,7 +3685,7 @@
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 35 / 37</span>
+          <span>p · 37 / 39</span>
         </div>
       </div>
     </section>
@@ -3352,7 +3714,7 @@
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>peppe</span></span>
-          <span>p · 36 / 37</span>
+          <span>p · 38 / 39</span>
         </div>
       </div>
     </section>
@@ -3379,7 +3741,7 @@
         </div>
         <div class="footer-row stagger">
           <span class="authors"><span>raffaele · giorgio · peppe</span></span>
-          <span>p · 37 / 37</span>
+          <span>p · 39 / 39</span>
         </div>
       </div>
     </section>
@@ -3390,7 +3752,7 @@
   <!-- ===== GALLERY OVERLAY ===== -->
   <div id="gallery">
     <div class="gallery-header">
-      <h2>tutte le 37 slide</h2>
+      <h2>tutte le 39 slide</h2>
       <span class="hint">esc o g per chiudere · click per andare</span>
     </div>
     <div class="gallery-grid" id="galleryGrid"></div>
@@ -3578,7 +3940,8 @@
     // Count-up animation: numero da 0 a target con easing Farm Minerals.
     // Triggered ogni volta che una slide diventa 'entered'.
     // ──────────────────────────────────────────────────────────────
-    function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
+    // easeInQuart: parte lento, accelera verso la fine (richiesta esperto 2026-05-17 su r08)
+    function easeInQuart(t) { return t * t * t * t; }
 
     function animateCountUp(el) {
       var target = parseInt(el.getAttribute('data-target'), 10);
@@ -3586,7 +3949,7 @@
       var start = performance.now();
       function tick(now) {
         var t = Math.min(1, (now - start) / duration);
-        var v = Math.round(easeOutQuint(t) * target);
+        var v = Math.round(easeInQuart(t) * target);
         el.textContent = v;
         if (t < 1) requestAnimationFrame(tick);
       }
