@@ -158,6 +158,11 @@
       padding-top: 28px;
     }
 
+    /* Hide per-slide hardcoded counter (right side of footer): superseded by
+       auto-counter bottom-left (#counter). The author span has a class, the
+       counter span has none, so this targets only the counter. */
+    .footer-row > span:not([class]) { display: none; }
+
     .footer-row::before {
       content: "";
       position: absolute;
@@ -1956,6 +1961,78 @@
     #p32a .footer-row { color: var(--main-green); }
     #p32a .footer-row::before { background: rgba(64, 79, 29, 0.20); }
 
+    /* pX, pY — stat-hero come p30 + arg-band come p32a (slide nuove 2026-05-19) */
+    #pX, #pY { background: var(--beige); color: var(--green-deep); }
+    #pX .overlay, #pY .overlay {
+      position: relative; height: 100%; padding: 96px;
+      display: grid; grid-template-rows: auto 1fr auto; row-gap: 48px;
+    }
+    #pX h2.stagger, #pY h2.stagger { display: none; } /* h2 vive dentro stat-caption */
+    #pX .stat-hero, #pY .stat-hero {
+      align-self: center;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      column-gap: 64px;
+      align-items: end;
+    }
+    #pX .stat-number, #pY .stat-number {
+      font-family: var(--font-sans);
+      font-weight: 400; font-size: 280px;
+      line-height: 0.85; letter-spacing: -0.04em;
+      color: var(--main-green); margin: 0;
+    }
+    #pX .stat-number .unit, #pY .stat-number .unit {
+      font-size: 110px;
+      color: var(--green-light);
+      vertical-align: top;
+      letter-spacing: -0.04em;
+      margin-left: 18px;
+    }
+    #pX .stat-caption, #pY .stat-caption { align-self: end; padding-bottom: 32px; }
+    #pX .stat-caption h2, #pY .stat-caption h2 {
+      font-weight: 500; font-size: 48px;
+      line-height: 1.0; letter-spacing: -0.02em;
+      text-transform: lowercase; color: var(--main-green);
+      margin: 0 0 22px;
+    }
+    #pX .stat-caption p, #pY .stat-caption p {
+      font-size: 22px; line-height: 1.45;
+      color: var(--green-deep); max-width: 560px; margin: 0;
+    }
+    #pX .stat-caption p strong, #pY .stat-caption p strong { font-weight: 500; color: var(--main-green); }
+    #pX .arg-band {
+      display: grid; grid-template-columns: 1fr 1fr;
+      column-gap: 64px;
+      border-top: 1px solid rgba(64, 79, 29, 0.18);
+      padding-top: 32px;
+    }
+    #pY .arg-band {
+      display: block;
+      border-top: 1px solid rgba(64, 79, 29, 0.18);
+      padding-top: 32px;
+    }
+    #pX .arg-stat .arg-num, #pY .arg-stat .arg-num {
+      font-family: var(--font-sans);
+      font-weight: 500; font-size: 64px;
+      line-height: 1; letter-spacing: -0.02em;
+      color: var(--main-green); margin: 0 0 10px;
+    }
+    #pX .arg-stat .arg-cap, #pY .arg-stat .arg-cap {
+      font-size: 18px; line-height: 1.4;
+      color: var(--green-deep); margin: 0; max-width: 480px;
+    }
+    #pX .arg-stat.highlight .arg-num, #pY .arg-stat.highlight .arg-num { color: var(--green-light); }
+    #pY .arg-stat.highlight .arg-num { font-size: 96px; }
+    #pY .arg-stat .pct-small { font-size: 48px; margin-left: 4px; }
+    #pX .footer-row, #pY .footer-row { color: var(--main-green); }
+    #pX .footer-row::before, #pY .footer-row::before { background: rgba(64, 79, 29, 0.20); }
+
+    /* count-up glow on enter (come p30) */
+    #pX.entered .stat-number .count-up,
+    #pY.entered .stat-number .count-up {
+      animation: numberGlow 3s ease-in-out 2s infinite;
+    }
+
     /* p33 — Pistola fumante (claim glyph dramatico) */
     #p33 { background: var(--main-green); color: var(--beige); }
     #p33 .overlay {
@@ -2739,7 +2816,7 @@
 
         <div class="text-col stagger">
           <p class="citation">zinno et al. · 2023 · food microbiology</p>
-          <h2>cercavano il gene <span class="proper">tet(M)</span> nei <span class="proper">LAB</span> dei formaggi italiani.</h2>
+          <h2>una review critica: i <span class="proper">LAB</span> dei fermentati trasferiscono davvero le resistenze?</h2>
           <p class="body-text">Obiettivo: misurare la presenza di geni di resistenza a tetracicline negli starter caseari, lievito naturale del nostro patrimonio fermentativo, e tracciarne il rischio di trasferimento orizzontale.</p>
         </div>
 
@@ -3321,7 +3398,6 @@
         </div>
       </div>
     </section>
-
     <!-- p26 — Paper Xiang -->
     <section class="slide" id="p26" data-personality="magazine-paper-spread">
       <div class="overlay hero-overlay" style="color: var(--main-green);">
@@ -3343,7 +3419,21 @@
         </div>
       </div>
     </section>
-
+    <!-- p28 — Obiettivo -->
+    <section class="slide" id="p28" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 25 — obiettivo</span>
+        </div>
+        <h2 class="stagger">prove molecolari, non più ipotesi.</h2>
+        <p class="obj-body stagger">Tracciare i ceppi batterici e i geni di resistenza <strong>dal cibo fermentato cinese al microbiota intestinale umano</strong>, usando la <em>metagenomica shotgun</em> — sequenziamento dell'intero DNA microbico, non solo del 16S rRNA. Per la prima volta a livello di ceppo e gene.</p>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 29 / 39</span>
+        </div>
+      </div>
+    </section>
     <!-- p27a — Identificazione specie batteriche (starter + Enterobacteriaceae) -->
     <section class="slide has-dots" id="p27a" data-personality="manifesto-tipografico">
       <div class="overlay">
@@ -3386,127 +3476,6 @@
         </div>
       </div>
     </section>
-
-    <!-- p27 — La domanda chiave (con image bg microbiome) -->
-    <section class="slide" id="p27" data-personality="manifesto-tipografico">
-      <img class="hero-media" src="assets/p27-gut-microbiome.png" alt="" loading="eager">
-      <div class="hero-shade diag-bl"></div>
-      <div class="overlay">
-        <div class="eyebrow stagger">
-          <span class="dot"></span>
-          <span>capitolo 24 — la domanda</span>
-        </div>
-        <div class="claim-block stagger">
-          <p class="glyph-claim">quando li mangiamo, <span class="em">colonizzano davvero</span>?</p>
-        </div>
-        <div class="footer-row stagger">
-          <span class="authors"><span>peppe</span></span>
-          <span>p · 28 / 39</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- p28 — Obiettivo -->
-    <section class="slide" id="p28" data-personality="manifesto-tipografico">
-      <div class="overlay">
-        <div class="eyebrow stagger">
-          <span class="dot"></span>
-          <span>capitolo 25 — obiettivo</span>
-        </div>
-        <h2 class="stagger">prove molecolari, non più ipotesi.</h2>
-        <p class="obj-body stagger">Tracciare i ceppi batterici e i geni di resistenza <strong>dal cibo fermentato cinese al microbiota intestinale umano</strong>, usando la <em>metagenomica shotgun</em> — sequenziamento dell'intero DNA microbico, non solo del 16S rRNA. Per la prima volta a livello di ceppo e gene.</p>
-        <div class="footer-row stagger">
-          <span class="authors"><span>peppe</span></span>
-          <span>p · 29 / 39</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- p29 — Metodi pipeline -->
-    <section class="slide has-dots" id="p29" data-personality="flowchart-orizzontale">
-      <div class="overlay">
-        <div class="eyebrow stagger">
-          <span class="dot"></span>
-          <span>capitolo 26 — metodi</span>
-        </div>
-        <h2 class="stagger">dalla salsa di soia al microbioma intestinale.</h2>
-        <div class="pipeline-row">
-          <div class="step stagger">
-            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><rect x="10" y="20" width="36" height="26" rx="2"/><path d="M18 20v-6h20v6"/><circle cx="22" cy="33" r="2"/><circle cx="28" cy="36" r="2"/><circle cx="34" cy="32" r="2"/></svg></div>
-            <p class="num">01 · raccolta</p>
-            <p class="title">93 campioni</p>
-            <p class="body">Cibi fermentati di soia tradizionali cinesi: douchi (fagioli), fu ru (tofu), dou jiang (pasta) da diverse province.</p>
-          </div>
-          <div class="step stagger">
-            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><path d="M28 8v40M8 28h40"/><circle cx="28" cy="28" r="20"/><path d="M14 14l28 28M14 42l28-28"/></svg></div>
-            <p class="num">02 · metagenomica</p>
-            <p class="title">shotgun seq</p>
-            <p class="body">Sequenziamento dell'intero DNA microbico — non solo 16S, ma tutti i geni di tutti i batteri.</p>
-          </div>
-          <div class="step stagger">
-            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><circle cx="28" cy="28" r="20"/><path d="M16 28a12 12 0 0124 0M28 16v24"/></svg></div>
-            <p class="num">03 · confronto</p>
-            <p class="title">gut metagenomi</p>
-            <p class="body">Confronto strain-by-strain con metagenomi del microbiota intestinale cinese pubblicati.</p>
-          </div>
-          <div class="step stagger">
-            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 28h12l4-12 8 24 4-12h12"/><circle cx="28" cy="28" r="3"/></svg></div>
-            <p class="num">04 · hgt analysis</p>
-            <p class="title">ARG tracking</p>
-            <p class="body">Identificazione di eventi di trasferimento orizzontale di geni di resistenza tra cibo e gut.</p>
-          </div>
-        </div>
-        <div class="footer-row stagger">
-          <span class="authors"><span>peppe</span></span>
-          <span>p · 30 / 39</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- p30 — Strain sharing (stat hero con petri bg) -->
-    <section class="slide has-dots" id="p30" data-personality="hero-verbale-gigante">
-      <img class="hero-media" src="assets/p30-food-gut-bridge.png" alt="" loading="eager">
-      <div class="hero-shade diag-tl"></div>
-      <div class="overlay">
-        <div class="eyebrow stagger">
-          <span class="dot"></span>
-          <span>capitolo 27 — risultato 1</span>
-        </div>
-        <div class="stat-hero stagger">
-          <p class="stat-number"><span class="count-up" data-target="203" data-duration="1800">0</span><span class="unit">ceppi</span></p>
-          <div class="stat-caption">
-            <h2>identici tra cibo e intestino umano.</h2>
-            <p>la metagenomica ha trovato <strong>203 ceppi batterici geneticamente identici</strong> sia nei prodotti di soia sia nel microbiota intestinale cinese — non parenti, gli <em>stessi</em> ceppi.</p>
-          </div>
-        </div>
-        <div class="footer-row stagger">
-          <span class="authors"><span>peppe</span></span>
-          <span>p · 31 / 39</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- p31 — Klebsiella -->
-    <section class="slide" id="p31" data-personality="hero-verbale-gigante">
-      <img class="hero-media" src="assets/p31-klebsiella-petri.png" alt="" loading="eager">
-      <div class="hero-shade diag-tl"></div>
-      <div class="overlay">
-        <div class="eyebrow stagger">
-          <span class="dot"></span>
-          <span>capitolo 28 — risultato 2</span>
-        </div>
-        <div class="name-block stagger">
-          <p class="name-eyebrow">patogeno · multiresistente · trovato</p>
-          <h1><span class="proper">Klebsiella</span><br><span class="accent proper">pneumoniae</span>.</h1>
-          <p class="name-tag">Identificata in <strong>più campioni di cibo fermentato</strong> — patogeno nosocomiale classico, responsabile di polmoniti, sepsi e infezioni urinarie ospedaliere. Anche la cugina <em>K. quasipneumoniae</em> è stata trovata.</p>
-        </div>
-        <div class="footer-row stagger">
-          <span class="authors"><span>peppe</span></span>
-          <span>p · 32 / 39</span>
-        </div>
-      </div>
-    </section>
-
     <!-- p32a — Annotazione funzionale: 2.4M geni + 3 database + ARG breakdown -->
     <section class="slide has-dots" id="p32a" data-personality="schema-scientifico-fullbleed">
       <div class="overlay">
@@ -3573,7 +3542,6 @@
         </div>
       </div>
     </section>
-
     <!-- p32 — HGT pompe di efflusso -->
     <section class="slide" id="p32" data-personality="manifesto-tipografico">
       <div class="overlay">
@@ -3612,6 +3580,151 @@
       </div>
     </section>
 
+    <!-- pX — MAG binning (asciutto: 1 numero hero + 1 caption + mini-band) -->
+    <section class="slide has-dots" id="pX" data-personality="schema-scientifico-fullbleed">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 28c — MAG binning</span>
+        </div>
+
+        <div class="stat-hero stagger">
+          <p class="stat-number"><span class="count-up" data-target="707" data-duration="1800">0</span><span class="unit">MAG</span></p>
+          <div class="stat-caption">
+            <h2>ricostruiti dal cibo fermentato.</h2>
+            <p>binning con <strong>metaWRAP</strong> su douchi, fu ru e dou jiang — qualità ≥70% completezza, &lt;10% contaminazione.</p>
+          </div>
+        </div>
+
+        <div class="arg-band stagger">
+          <div class="arg-stat">
+            <p class="arg-num">304</p>
+            <p class="arg-cap">MAG non ridondanti dopo dereplicazione al <strong>95% ANI</strong>.</p>
+          </div>
+          <div class="arg-stat highlight">
+            <p class="arg-num">24.417</p>
+            <p class="arg-cap">MAG intestinali cinesi <em>(Pasolli et al.)</em> come termine di paragone.</p>
+          </div>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · x / 40</span>
+        </div>
+      </div>
+    </section>
+    <!-- p30 — Strain sharing (stat hero con petri bg) -->
+    <section class="slide has-dots" id="p30" data-personality="hero-verbale-gigante">
+      <img class="hero-media" src="assets/p30-food-gut-bridge.png" alt="" loading="eager">
+      <div class="hero-shade diag-tl"></div>
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 27 — risultato 1</span>
+        </div>
+        <div class="stat-hero stagger">
+          <p class="stat-number"><span class="count-up" data-target="203" data-duration="1800">0</span><span class="unit">ceppi</span></p>
+          <div class="stat-caption">
+            <h2>identici tra cibo e intestino umano.</h2>
+            <p>la metagenomica ha trovato <strong>203 ceppi batterici geneticamente identici</strong> sia nei prodotti di soia sia nel microbiota intestinale cinese — non parenti, gli <em>stessi</em> ceppi.</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 31 / 39</span>
+        </div>
+      </div>
+    </section>
+    <!-- p31 — Klebsiella -->
+    <section class="slide" id="p31" data-personality="hero-verbale-gigante">
+      <img class="hero-media" src="assets/p31-klebsiella-petri.png" alt="" loading="eager">
+      <div class="hero-shade diag-tl"></div>
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 28 — risultato 2</span>
+        </div>
+        <div class="name-block stagger">
+          <p class="name-eyebrow">patogeno · multiresistente · trovato</p>
+          <h1><span class="proper">Klebsiella</span><br><span class="accent proper">pneumoniae</span>.</h1>
+          <p class="name-tag">Identificata in <strong>più campioni di cibo fermentato</strong> — patogeno nosocomiale classico, responsabile di polmoniti, sepsi e infezioni urinarie ospedaliere. Anche la cugina <em>K. quasipneumoniae</em> è stata trovata.</p>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 32 / 39</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- pY — analisi HGT blastp (asciutto: 1 numero hero + 1 caption + mini-band) -->
+    <section class="slide has-dots" id="pY" data-personality="manifesto-tipografico">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 28d — analisi HGT</span>
+        </div>
+
+        <div class="stat-hero stagger">
+          <p class="stat-number"><span class="count-up" data-target="898" data-duration="1800">0</span><span class="unit">hits</span></p>
+          <div class="stat-caption">
+            <h2>ARG del cibo ritrovati nel gut.</h2>
+            <p><strong>blastp</strong> di <strong>2.406</strong> sequenze ARG (dai tre soia) contro <strong>216.849</strong> ARG del microbioma umano <em>(Lee et al.)</em>.</p>
+          </div>
+        </div>
+
+        <div class="arg-band stagger">
+          <div class="arg-stat highlight">
+            <p class="arg-num">93,38<span class="pct-small">%</span></p>
+            <p class="arg-cap">dei <strong>4.518</strong> omologhi nel gut arriva da <strong>metagenomi fecali</strong> — i microbi sopravvivono al passaggio intestinale.</p>
+          </div>
+        </div>
+
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · y / 40</span>
+        </div>
+      </div>
+    </section>
+    <!-- p29 — Metodi pipeline -->
+    <section class="slide has-dots" id="p29" data-personality="flowchart-orizzontale">
+      <div class="overlay">
+        <div class="eyebrow stagger">
+          <span class="dot"></span>
+          <span>capitolo 26 — metodi</span>
+        </div>
+        <h2 class="stagger">dalla salsa di soia al microbioma intestinale.</h2>
+        <div class="pipeline-row">
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><rect x="10" y="20" width="36" height="26" rx="2"/><path d="M18 20v-6h20v6"/><circle cx="22" cy="33" r="2"/><circle cx="28" cy="36" r="2"/><circle cx="34" cy="32" r="2"/></svg></div>
+            <p class="num">01 · raccolta</p>
+            <p class="title">93 campioni</p>
+            <p class="body">Cibi fermentati di soia tradizionali cinesi: douchi (fagioli), fu ru (tofu), dou jiang (pasta) da diverse province.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><path d="M28 8v40M8 28h40"/><circle cx="28" cy="28" r="20"/><path d="M14 14l28 28M14 42l28-28"/></svg></div>
+            <p class="num">02 · metagenomica</p>
+            <p class="title">shotgun seq</p>
+            <p class="body">Sequenziamento dell'intero DNA microbico — non solo 16S, ma tutti i geni di tutti i batteri.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><circle cx="28" cy="28" r="20"/><path d="M16 28a12 12 0 0124 0M28 16v24"/></svg></div>
+            <p class="num">03 · confronto</p>
+            <p class="title">gut metagenomi</p>
+            <p class="body">Confronto strain-by-strain con metagenomi del microbiota intestinale cinese pubblicati.</p>
+          </div>
+          <div class="step stagger">
+            <div class="icon"><svg viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 28h12l4-12 8 24 4-12h12"/><circle cx="28" cy="28" r="3"/></svg></div>
+            <p class="num">04 · hgt analysis</p>
+            <p class="title">ARG tracking</p>
+            <p class="body">Identificazione di eventi di trasferimento orizzontale di geni di resistenza tra cibo e gut.</p>
+          </div>
+        </div>
+        <div class="footer-row stagger">
+          <span class="authors"><span>peppe</span></span>
+          <span>p · 30 / 39</span>
+        </div>
+      </div>
+    </section>
     <!-- p33 — Pistola fumante (claim dramatico) -->
     <section class="slide" id="p33" data-personality="manifesto-tipografico">
       <div class="overlay">
@@ -3628,7 +3741,6 @@
         </div>
       </div>
     </section>
-
     <!-- p34 — Implicazioni 3 punti -->
     <section class="slide has-dots" id="p34" data-personality="manifesto-tipografico">
       <div class="overlay">
@@ -3660,7 +3772,6 @@
         </div>
       </div>
     </section>
-
     <!-- p35 — Limiti -->
     <section class="slide" id="p35" data-personality="manifesto-tipografico">
       <div class="overlay">
@@ -3689,7 +3800,6 @@
         </div>
       </div>
     </section>
-
     <!-- p36 — Conclusione 3 take-home -->
     <section class="slide has-dots" id="p36" data-personality="manifesto-tipografico">
       <div class="overlay">
@@ -3718,7 +3828,6 @@
         </div>
       </div>
     </section>
-
     <!-- p37 — Grazie wow finale (video bg + glyph cascade) -->
     <section class="slide" id="p37" data-personality="solid-color-concept">
       <video class="finale-bg" autoplay muted loop playsinline preload="auto">
@@ -3752,7 +3861,7 @@
   <!-- ===== GALLERY OVERLAY ===== -->
   <div id="gallery">
     <div class="gallery-header">
-      <h2>tutte le 39 slide</h2>
+      <h2>tutte le 40 slide</h2>
       <span class="hint">esc o g per chiudere · click per andare</span>
     </div>
     <div class="gallery-grid" id="galleryGrid"></div>
@@ -3760,7 +3869,7 @@
 
   <div class="gallery-trigger-hint">premi g per la galleria</div>
 
-  <div class="slide-counter"><span id="counter">01 / 14</span></div>
+  <div class="slide-counter"><span id="counter">01 / 40</span></div>
   <div class="nav-hint">← →  per navigare</div>
 
   <script>
